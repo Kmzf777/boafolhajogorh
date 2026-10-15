@@ -1,0 +1,662 @@
+[
+ {
+  "q": "A Boa Folha compra um caderno por R$ 10 e vende por R$ 15. Qual o markup sobre o custo?",
+  "a": [
+   "50%",
+   "33%",
+   "150%",
+   "5%"
+  ],
+  "c": 0,
+  "e": "Markup = (15 - 10) / 10 = 50% sobre o custo."
+ },
+ {
+  "q": "Mesmo caderno: custo R$ 10, venda R$ 15. Qual a margem bruta sobre o preço de venda?",
+  "a": [
+   "50%",
+   "Cerca de 33,3%",
+   "66,7%",
+   "25%"
+  ],
+  "c": 1,
+  "e": "Margem = lucro bruto / preço = 5 / 15 ≈ 33,3%."
+ },
+ {
+  "q": "O financeiro pediu o fluxo de caixa. O que ele registra?",
+  "a": [
+   "O lucro contábil do ano",
+   "O valor do estoque parado no galpão",
+   "Entradas e saídas efetivas de dinheiro no período",
+   "Vendas faturadas, recebidas ou não"
+  ],
+  "c": 2,
+  "e": "Fluxo de caixa acompanha o dinheiro que de fato entra e sai, não o lucro contábil."
+ },
+ {
+  "q": "Na planilha do diretor, capital de giro (líquido) é calculado como:",
+  "a": [
+   "Ativo total menos patrimônio líquido",
+   "Receita menos custo das mercadorias",
+   "Lucro líquido somado à depreciação",
+   "Ativo circulante menos passivo circulante"
+  ],
+  "c": 3,
+  "e": "Capital de giro líquido = ativo circulante - passivo circulante."
+ },
+ {
+  "q": "Custo fixo mensal de R$ 30.000; mochila vendida a R$ 100 com custo variável de R$ 40. Quantas mochilas para empatar?",
+  "a": [
+   "500",
+   "300",
+   "750",
+   "1.000"
+  ],
+  "c": 0,
+  "e": "Ponto de equilíbrio = 30.000 / (100 - 40) = 500 unidades."
+ },
+ {
+  "q": "O consultor de terno brilhante falou em EBITDA. O que a sigla representa?",
+  "a": [
+   "Lucro após impostos e antes de dividendos",
+   "Lucro antes de juros, impostos, depreciação e amortização",
+   "Receita bruta menos devoluções e descontos",
+   "Caixa gerado depois dos investimentos"
+  ],
+  "c": 1,
+  "e": "EBITDA = lucro antes de juros, impostos, depreciação e amortização."
+ },
+ {
+  "q": "Qual destes é um custo variável para a distribuidora?",
+  "a": [
+   "O aluguel do galpão",
+   "O salário fixo do contador",
+   "O custo das resmas compradas para revender",
+   "O seguro anual do prédio"
+  ],
+  "c": 2,
+  "e": "O custo da mercadoria revendida cresce ou cai conforme o volume vendido."
+ },
+ {
+  "q": "A DRE, aquele relatório que ninguém lê até dar prejuízo, mostra:",
+  "a": [
+   "Bens e dívidas da empresa numa data",
+   "Somente as entradas de caixa do mês",
+   "A lista de fornecedores ativos",
+   "Receitas, custos, despesas e resultado de um período"
+  ],
+  "c": 3,
+  "e": "A DRE apura o resultado (lucro ou prejuízo) de um período."
+ },
+ {
+  "q": "O balanço patrimonial apresenta:",
+  "a": [
+   "Ativos, passivos e patrimônio líquido numa data",
+   "Receitas e despesas do mês",
+   "Entradas e saídas de caixa da semana",
+   "As metas trimestrais da diretoria"
+  ],
+  "c": 0,
+  "e": "O balanço é uma foto da posição patrimonial numa data específica."
+ },
+ {
+  "q": "Qual é a equação fundamental da contabilidade?",
+  "a": [
+   "Passivo = Ativo + Patrimônio Líquido",
+   "Ativo = Passivo + Patrimônio Líquido",
+   "Patrimônio Líquido = Ativo + Passivo",
+   "Ativo = Receita - Despesa"
+  ],
+  "c": 1,
+  "e": "Tudo o que a empresa tem (ativo) é financiado por terceiros (passivo) ou sócios (PL)."
+ },
+ {
+  "q": "CMV anual de R$ 1,2 milhão e estoque médio de R$ 200 mil. Qual o giro de estoque?",
+  "a": [
+   "4 vezes ao ano",
+   "12 vezes ao ano",
+   "6 vezes ao ano",
+   "2,4 vezes ao ano"
+  ],
+  "c": 2,
+  "e": "Giro = CMV / estoque médio = 1.200.000 / 200.000 = 6."
+ },
+ {
+  "q": "Se o estoque gira 6 vezes ao ano (ano comercial de 360 dias), quanto tempo em média a mercadoria fica parada?",
+  "a": [
+   "30 dias",
+   "90 dias",
+   "6 dias",
+   "60 dias"
+  ],
+  "c": 3,
+  "e": "Prazo médio de estoque = 360 / 6 = 60 dias."
+ },
+ {
+  "q": "Na curva ABC do estoque, os itens da classe A são:",
+  "a": [
+   "Poucos itens que concentram a maior parte do valor",
+   "Muitos itens de baixo valor unitário",
+   "Itens com validade vencida",
+   "Itens ordenados alfabeticamente"
+  ],
+  "c": 0,
+  "e": "Classe A: poucos itens, grande peso no valor; exigem controle mais rigoroso."
+ },
+ {
+  "q": "No método PEPS, qual mercadoria sai do estoque primeiro?",
+  "a": [
+   "A mais recente, que entrou por último",
+   "A mais antiga, que entrou primeiro",
+   "A de maior preço unitário",
+   "A que estiver mais perto da porta"
+  ],
+  "c": 1,
+  "e": "PEPS = Primeiro que Entra, Primeiro que Sai."
+ },
+ {
+  "q": "A volta às aulas é o Natal da Boa Folha. Quando reforçar o estoque de material escolar?",
+  "a": [
+   "Em março, depois que a procura passar",
+   "Só quando o estoque zerar",
+   "Antes do pico de janeiro e fevereiro",
+   "Sempre no mesmo mês, sem olhar dados"
+  ],
+  "c": 2,
+  "e": "Na sazonalidade, o estoque deve estar pronto antes do pico de demanda."
+ },
+ {
+  "q": "Faturamento de R$ 90.000 em 300 pedidos no mês. Qual o ticket médio?",
+  "a": [
+   "R$ 270",
+   "R$ 3.000",
+   "R$ 30",
+   "R$ 300"
+  ],
+  "c": 3,
+  "e": "Ticket médio = 90.000 / 300 = R$ 300 por pedido."
+ },
+ {
+  "q": "O marketing gastou R$ 20.000 (com vendas) e trouxe 50 clientes novos. Qual o CAC?",
+  "a": [
+   "R$ 400",
+   "R$ 250",
+   "R$ 4.000",
+   "R$ 40"
+  ],
+  "c": 0,
+  "e": "CAC = investimento em aquisição / novos clientes = 20.000 / 50 = R$ 400."
+ },
+ {
+  "q": "O que significa LTV (Lifetime Value)?",
+  "a": [
+   "Custo para conquistar um cliente novo",
+   "Valor total que o cliente gera ao longo do relacionamento",
+   "Lucro obtido apenas no último pedido",
+   "Prazo médio que o cliente leva para pagar"
+  ],
+  "c": 1,
+  "e": "LTV estima quanto um cliente gera durante todo o tempo em que compra da empresa."
+ },
+ {
+  "q": "Começamos o mês com 200 papelarias clientes e 10 deixaram de comprar. Qual o churn mensal?",
+  "a": [
+   "10%",
+   "2%",
+   "5%",
+   "20%"
+  ],
+  "c": 2,
+  "e": "Churn = clientes perdidos / clientes no início = 10 / 200 = 5%."
+ },
+ {
+  "q": "Qual relação entre LTV e CAC indica um negócio mais saudável?",
+  "a": [
+   "CAC maior que o LTV",
+   "LTV exatamente igual ao CAC",
+   "Não existe relação entre eles",
+   "LTV bem maior que o CAC"
+  ],
+  "c": 3,
+  "e": "Se o cliente gera bem mais do que custou para conquistar, a aquisição se paga."
+ },
+ {
+  "q": "No funil de vendas, o que costuma ficar no topo?",
+  "a": [
+   "Leads e contatos ainda pouco qualificados",
+   "Clientes que já fecharam contrato",
+   "Pedidos entregues e faturados",
+   "Apenas os clientes mais fiéis"
+  ],
+  "c": 0,
+  "e": "O topo do funil é largo: muitos contatos, ainda sem qualificação."
+ },
+ {
+  "q": "Dos 400 leads da feira de papelaria, 20 viraram clientes. Qual a taxa de conversão?",
+  "a": [
+   "20%",
+   "5%",
+   "2%",
+   "8%"
+  ],
+  "c": 1,
+  "e": "Conversão = 20 / 400 = 5%."
+ },
+ {
+  "q": "Numa negociação com fornecedor de papel, o que é a BATNA (ou MAANA)?",
+  "a": [
+   "O preço máximo que o fornecedor aceita",
+   "A cláusula de multa do contrato",
+   "Sua melhor alternativa caso não haja acordo",
+   "O desconto padrão da empresa"
+  ],
+  "c": 2,
+  "e": "BATNA é o plano B: o que você faz se a negociação não fechar."
+ },
+ {
+  "q": "Em negociação, o que é a ZOPA?",
+  "a": [
+   "O preço de abertura do vendedor",
+   "A multa por desistência do acordo",
+   "A pauta escrita da reunião",
+   "A faixa em que um acordo é aceitável para os dois lados"
+  ],
+  "c": 3,
+  "e": "ZOPA = zona de possível acordo, onde os limites das partes se sobrepõem."
+ },
+ {
+  "q": "O que é um KPI?",
+  "a": [
+   "Um indicador-chave de desempenho",
+   "Um plano de cargos e salários",
+   "Um imposto sobre produtos importados",
+   "Uma meta qualitativa sem número"
+  ],
+  "c": 0,
+  "e": "KPI (Key Performance Indicator) mede o desempenho de algo que importa."
+ },
+ {
+  "q": "Como se estrutura um OKR?",
+  "a": [
+   "Orçamento anual detalhado por conta",
+   "Objetivo qualitativo e resultados-chave mensuráveis",
+   "Lista de tarefas diárias da equipe",
+   "Um único indicador financeiro da empresa"
+  ],
+  "c": 1,
+  "e": "OKR = Objective (aonde ir) + Key Results (como medir se chegou)."
+ },
+ {
+  "q": "Mochila custa R$ 20. A diretoria quer margem de 20% sobre o preço de venda. Qual o preço?",
+  "a": [
+   "R$ 24",
+   "R$ 22",
+   "R$ 25",
+   "R$ 40"
+  ],
+  "c": 2,
+  "e": "Preço = custo / (1 - margem) = 20 / 0,8 = R$ 25. R$ 24 seria markup de 20%."
+ },
+ {
+  "q": "Carteira de R$ 500 mil a receber, com R$ 25 mil vencidos e não pagos. Qual a inadimplência?",
+  "a": [
+   "2,5%",
+   "20%",
+   "50%",
+   "5%"
+  ],
+  "c": 3,
+  "e": "Inadimplência = 25.000 / 500.000 = 5%."
+ },
+ {
+  "q": "O que indica o prazo médio de recebimento (PMR)?",
+  "a": [
+   "Dias, em média, para receber dos clientes",
+   "Dias, em média, para pagar fornecedores",
+   "Dias que o estoque fica parado",
+   "Dias até o pedido chegar ao cliente"
+  ],
+  "c": 0,
+  "e": "PMR mede quanto tempo a empresa espera, em média, para receber suas vendas."
+ },
+ {
+  "q": "Prazo médio de estoque 60 dias, de recebimento 30 e de pagamento 45. Qual o ciclo financeiro?",
+  "a": [
+   "135 dias",
+   "45 dias",
+   "15 dias",
+   "75 dias"
+  ],
+  "c": 1,
+  "e": "Ciclo financeiro = PME + PMR - PMP = 60 + 30 - 45 = 45 dias."
+ },
+ {
+  "q": "Qual atitude tende a melhorar o caixa da distribuidora?",
+  "a": [
+   "Dar mais prazo para os clientes pagarem",
+   "Comprar de uma vez o estoque do ano inteiro",
+   "Alongar o prazo com fornecedores sem custo extra",
+   "Pagar fornecedores antes, sem ganhar desconto"
+  ],
+  "c": 2,
+  "e": "Pagar mais tarde sem custo mantém o dinheiro mais tempo no caixa."
+ },
+ {
+  "q": "A Boa Folha vende 500 caixas de lápis para uma rede de papelarias. Que tipo de venda é essa?",
+  "a": [
+   "B2C",
+   "C2C",
+   "B2G",
+   "B2B"
+  ],
+  "c": 3,
+  "e": "Empresa vendendo para empresa é B2B (business to business)."
+ },
+ {
+  "q": "No site da Boa Folha, uma mãe compra uma mochila para o filho. Que tipo de venda é essa?",
+  "a": [
+   "B2C",
+   "B2B",
+   "B2G",
+   "C2B"
+  ],
+  "c": 0,
+  "e": "Empresa vendendo ao consumidor final é B2C (business to consumer)."
+ },
+ {
+  "q": "O que é o Simples Nacional?",
+  "a": [
+   "Imposto federal cobrado só sobre importados",
+   "Regime tributário simplificado para micro e pequenas empresas",
+   "Regime obrigatório para grandes empresas",
+   "Isenção total de impostos para o varejo"
+  ],
+  "c": 1,
+  "e": "É um regime opcional que unifica tributos numa guia única para MEs e EPPs."
+ },
+ {
+  "q": "Conceitualmente, o ICMS é um imposto:",
+  "a": [
+   "Municipal, sobre serviços em geral",
+   "Federal, sobre a renda das empresas",
+   "Estadual, sobre circulação de mercadorias e certos serviços",
+   "Federal, sobre a folha de salários"
+  ],
+  "c": 2,
+  "e": "ICMS é estadual e incide sobre a circulação de mercadorias e alguns serviços."
+ },
+ {
+  "q": "Que cláusula de contrato fixa a penalidade se uma parte não cumprir o combinado?",
+  "a": [
+   "Cláusula de foro",
+   "Cláusula de vigência",
+   "Cláusula de confidencialidade",
+   "Cláusula penal (multa)"
+  ],
+  "c": 3,
+  "e": "A cláusula penal estabelece a multa por descumprimento."
+ },
+ {
+  "q": "No contrato com a transportadora, o que define a cláusula de foro?",
+  "a": [
+   "Onde eventuais disputas judiciais serão julgadas",
+   "Por quanto tempo o contrato vale",
+   "O valor da multa por atraso",
+   "Quem paga o frete de devolução"
+  ],
+  "c": 0,
+  "e": "Foro de eleição indica a comarca para resolver litígios do contrato."
+ },
+ {
+  "q": "Em gestão de projetos, o que é o caminho crítico?",
+  "a": [
+   "As tarefas mais caras do projeto",
+   "Sequência de tarefas sem folga que define o prazo total",
+   "As tarefas feitas pelo gerente",
+   "A lista de riscos do projeto"
+  ],
+  "c": 1,
+  "e": "Atrasar qualquer tarefa do caminho crítico atrasa o projeto inteiro."
+ },
+ {
+  "q": "O clássico triângulo de restrições de um projeto envolve:",
+  "a": [
+   "Custo, lucro e imposto",
+   "Qualidade, vendas e estoque",
+   "Escopo, prazo e custo",
+   "Escopo, marketing e RH"
+  ],
+  "c": 2,
+  "e": "Mexer em escopo, prazo ou custo afeta os outros dois (e a qualidade)."
+ },
+ {
+  "q": "O que propõe a liderança situacional?",
+  "a": [
+   "Usar sempre o mesmo estilo com todos",
+   "Liderar apenas em momentos de crise",
+   "Delegar tudo desde o primeiro dia",
+   "Adaptar o estilo à maturidade do liderado"
+  ],
+  "c": 3,
+  "e": "O líder ajusta direção e apoio conforme a competência e o engajamento da pessoa."
+ },
+ {
+  "q": "Qual prática caracteriza um bom feedback?",
+  "a": [
+   "Específico, sobre comportamento e perto do fato",
+   "Genérico, para não constranger ninguém",
+   "Dado apenas na avaliação anual",
+   "Focado na personalidade da pessoa"
+  ],
+  "c": 0,
+  "e": "Feedback útil é específico, oportuno e foca em comportamentos observáveis."
+ },
+ {
+  "q": "Receita anual de R$ 1.000.000 e lucro líquido de R$ 80.000. Qual a margem líquida?",
+  "a": [
+   "80%",
+   "8%",
+   "12,5%",
+   "0,8%"
+  ],
+  "c": 1,
+  "e": "Margem líquida = 80.000 / 1.000.000 = 8%."
+ },
+ {
+  "q": "Qual a diferença entre margem bruta e margem líquida?",
+  "a": [
+   "A bruta já inclui o imposto sobre o lucro",
+   "As duas são sempre iguais",
+   "A líquida desconta também despesas, juros e impostos",
+   "A líquida ignora o custo da mercadoria"
+  ],
+  "c": 2,
+  "e": "A bruta tira só o custo da mercadoria; a líquida tira todo o resto também."
+ },
+ {
+  "q": "Qual característica define um custo fixo?",
+  "a": [
+   "Sobe na mesma proporção das vendas",
+   "Só existe em épocas de volta às aulas",
+   "É sempre menor que o custo variável",
+   "Não muda com o volume de vendas no curto prazo"
+  ],
+  "c": 3,
+  "e": "Custo fixo (aluguel, por exemplo) se mantém mesmo se as vendas variarem."
+ },
+ {
+  "q": "Estojo vendido a R$ 50 com custo variável de R$ 30. Qual a margem de contribuição unitária?",
+  "a": [
+   "R$ 20",
+   "R$ 80",
+   "R$ 30",
+   "R$ 1,67"
+  ],
+  "c": 0,
+  "e": "Margem de contribuição = preço - custo variável = 50 - 30 = R$ 20."
+ },
+ {
+  "q": "Vendemos 1.000 cadernos a R$ 12, custo variável R$ 7 cada e custo fixo de R$ 3.000. Qual o lucro?",
+  "a": [
+   "R$ 5.000",
+   "R$ 2.000",
+   "R$ 9.000",
+   "R$ 8.000"
+  ],
+  "c": 1,
+  "e": "Lucro = 1.000 x (12 - 7) - 3.000 = 5.000 - 3.000 = R$ 2.000."
+ },
+ {
+  "q": "Agenda de R$ 20 sai com 10% de desconto. Custo: R$ 15. Qual a margem bruta sobre o preço final?",
+  "a": [
+   "20%",
+   "25%",
+   "Cerca de 16,7%",
+   "15%"
+  ],
+  "c": 2,
+  "e": "Preço final R$ 18; lucro R$ 3; margem = 3 / 18 ≈ 16,7%."
+ },
+ {
+  "q": "As vendas bateram recorde, mas o caixa está no vermelho. Causa mais provável?",
+  "a": [
+   "Lucro alto demais no período",
+   "Queda do custo fixo",
+   "Clientes pagando tudo à vista",
+   "Vendas com prazo longo e estoque crescendo"
+  ],
+  "c": 3,
+  "e": "Vender a prazo e encher o estoque consome caixa antes do dinheiro entrar."
+ },
+ {
+  "q": "Lucro operacional (EBIT) de R$ 300 mil e depreciação e amortização de R$ 50 mil. Qual o EBITDA?",
+  "a": [
+   "R$ 350 mil",
+   "R$ 250 mil",
+   "R$ 300 mil",
+   "R$ 50 mil"
+  ],
+  "c": 0,
+  "e": "EBITDA = EBIT + depreciação e amortização = 300 + 50 = R$ 350 mil."
+ },
+ {
+  "q": "Na contabilidade, depreciação é:",
+  "a": [
+   "Desconto concedido a clientes fiéis",
+   "Perda de valor de bens, como a empilhadeira, com uso e tempo",
+   "Juros pagos em empréstimos",
+   "Queda no preço do papel no mercado"
+  ],
+  "c": 1,
+  "e": "Depreciação reconhece o desgaste de ativos ao longo da vida útil."
+ },
+ {
+  "q": "O que significa cross-docking na logística?",
+  "a": [
+   "Estocar mercadoria por longos períodos",
+   "Fazer entregas apenas por via marítima",
+   "Receber e expedir a carga quase sem armazenar",
+   "Devolver toda a mercadoria ao fornecedor"
+  ],
+  "c": 2,
+  "e": "No cross-docking a carga passa pelo centro de distribuição e segue rápido."
+ },
+ {
+  "q": "O fornecedor de mochilas diz que o lead time é de 20 dias. Isso significa:",
+  "a": [
+   "Prazo para pagar o boleto",
+   "Validade da proposta comercial",
+   "Tempo de garantia do produto",
+   "Tempo entre fazer o pedido e receber a mercadoria"
+  ],
+  "c": 3,
+  "e": "Lead time é o tempo total do pedido até a entrega."
+ },
+ {
+  "q": "Para que serve o estoque de segurança?",
+  "a": [
+   "Cobrir atrasos ou demanda acima do previsto",
+   "Guardar produtos com defeito",
+   "Esconder mercadoria do inventário",
+   "Substituir o seguro do galpão"
+  ],
+  "c": 0,
+  "e": "É uma reserva que evita ruptura quando algo foge do planejado."
+ },
+ {
+  "q": "O que é logística reversa?",
+  "a": [
+   "Entrega feita de ré pelo caminhão",
+   "Fluxo de retorno de produtos, devoluções e embalagens",
+   "Transporte do fornecedor até o cliente",
+   "Planejamento de rotas mais curtas"
+  ],
+  "c": 1,
+  "e": "Logística reversa cuida do caminho de volta: devoluções, trocas e descarte."
+ },
+ {
+  "q": "Metas SMART devem ser:",
+  "a": [
+   "Simples, modernas, ágeis, rápidas e técnicas",
+   "Secretas, mutáveis, amplas, rígidas e totais",
+   "Específicas, mensuráveis, atingíveis, relevantes e temporais",
+   "Sazonais, médias, anuais, reais e trimestrais"
+  ],
+  "c": 2,
+  "e": "SMART: Specific, Measurable, Achievable, Relevant, Time-bound."
+ },
+ {
+  "q": "Custo fixo de R$ 40.000 e margem de contribuição de 40% sobre as vendas. Qual a receita de equilíbrio?",
+  "a": [
+   "R$ 16.000",
+   "R$ 56.000",
+   "R$ 160.000",
+   "R$ 100.000"
+  ],
+  "c": 3,
+  "e": "Receita de equilíbrio = 40.000 / 0,40 = R$ 100.000."
+ },
+ {
+  "q": "Resma custa R$ 10 e é vendida a R$ 25. Qual o markup multiplicador?",
+  "a": [
+   "2,5",
+   "1,5",
+   "0,4",
+   "2,0"
+  ],
+  "c": 0,
+  "e": "Markup multiplicador = preço / custo = 25 / 10 = 2,5."
+ },
+ {
+  "q": "O estagiário confundiu faturamento com lucro. Faturamento é:",
+  "a": [
+   "O que sobra depois de pagar tudo",
+   "O total das vendas, antes de custos e despesas",
+   "O dinheiro guardado no cofre",
+   "O valor do patrimônio dos sócios"
+  ],
+  "c": 1,
+  "e": "Faturamento (receita) é o total vendido; lucro é o que sobra após custos e despesas."
+ },
+ {
+  "q": "O que sugere o princípio de Pareto (80/20)?",
+  "a": [
+   "Todo cliente tem o mesmo peso nas vendas",
+   "80% dos custos são sempre fixos",
+   "Poucas causas respondem pela maior parte dos efeitos",
+   "Só 20% dos funcionários devem ter meta"
+  ],
+  "c": 2,
+  "e": "Em geral, uma minoria de itens ou clientes concentra a maior parte do resultado."
+ },
+ {
+  "q": "Antecipar recebíveis no banco serve principalmente para:",
+  "a": [
+   "Reduzir o valor dos impostos devidos",
+   "Aumentar a margem bruta dos produtos",
+   "Acabar com a inadimplência sem nenhum custo",
+   "Transformar vendas a prazo em caixa agora, pagando taxa"
+  ],
+  "c": 3,
+  "e": "A antecipação traz o dinheiro antes do vencimento, mas com desconto/juros."
+ }
+]
