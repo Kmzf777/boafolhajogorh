@@ -34,7 +34,7 @@ function jogar() {
     R.resultadoTreino(st, ac);
     const sen = st.time.filter(m => R.CHAR[m.id].nivel === 'S'); if (st.mentoria && sen.length) st.mentor = sen[0].id;
     // escalação: melhores contra o chefe
-    const ord = st.time.filter(m => m.id !== st.atestado).sort((a, z) => valor(z, b, st) - valor(a, b, st));
+    const ord = st.time.filter(m => !R.ausencia(st, m.id)).sort((a, z) => valor(z, b, st) - valor(a, b, st));
     R.escalar(st, ord.slice(0, 4).map(m => m.id));
     // gasta PT no H do melhor escalado
     let guard = 20; while (st.pt >= 2 && guard--) { const alvo = st.escalacao.map(id => st.time.find(m => m.id === id)).sort((a, z) => z.H - a.H).find(m => m.H < 10); if (!alvo || R.treinar(st, alvo.id, 'H')) break; }

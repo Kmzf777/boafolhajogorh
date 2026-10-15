@@ -163,8 +163,8 @@ function dicaStats() { return '<span class="sub">H = Hard skill · S = Soft skil
 
 /* ---------- UI: navegação ---------- */
 const UI = {
-  ui: null,
-  limpar() { this.ui.innerHTML = ''; FX.limpar(); },
+  ui: null, timers: [],
+  limpar() { this.ui.innerHTML = ''; FX.limpar(); this.timers.forEach(clearInterval); this.timers = []; },
   html(h) { this.ui.insertAdjacentHTML('beforeend', h); return this.ui.lastElementChild; },
   barra() {
     const st = Estado.st, b = Regras.boss(st);
@@ -241,11 +241,11 @@ const Ajuda = {
 /* ---------- JOGO: fluxo do mês ---------- */
 const Jogo = {
   novo() { Estado.st = Regras.novoJogo(); Estado.st.usadas = { rh: [], neg: [], esc: [] }; Jogo.inicioMes(); },
-  retomar() { const st = Estado.st; st.usadas = st.usadas || { rh: [], neg: [], esc: [] }; if (st.fase === 'inicioMes') Jogo.inicioMes(); else Hub.abrir(); },
+  retomar() { const st = Estado.st; st.usadas = st.usadas || { rh: [], neg: [], esc: [] }; if (!st.ausencias) st.ausencias = st.atestado ? [{ id: st.atestado, tipo: 'atestado' }] : []; delete st.atestado; if (st.fase === 'inicioMes') Jogo.inicioMes(); else Hub.abrir(); },
   async inicioMes() {
     const st = Estado.st, ev = Regras.iniciarMes(st); Estado.salvar();
     UI.limpar(); Cena.setar('escritorio', 'andar'); Som.music(null); Som.stopMusic(); Som.ambient(true);
-    st.time.forEach(m => Cena.ator(m.id, 20 + Math.random() * 260, 125 + Math.random() * 45));
+    st.time.filter(m => !Regras.ausencia(st, m.id)).forEach(m => Cena.ator(m.id, 20 + Math.random() * 260, 125 + Math.random() * 45));
     const b = Regras.boss(st);
     const card = UI.html(`<div class="painel escuro" style="left:230px;top:120px;width:500px;text-align:center"><div class="sub">MÊS ${st.mes + 1} DE 12</div><div class="tit" style="font-size:34px">${Regras.MESES[st.mes]}</div><div style="margin-top:6px">Chefe do mês: <b style="color:var(--ouro)">${esc(b.nome)}</b></div></div>`);
     await esperar(1700); card.remove();
@@ -257,9 +257,27 @@ const Eventos = {
   mostrar(ev) {
     return new Promise(res => {
       Som.sfx(SOM_EVENTO[ev.id]);
-      const st = Estado.st, extra = ev.id === 'gripe' && st.atestado ? `<p><b>${esc(Regras.CHAR[st.atestado].nome)}</b> está de atestado.</p>` : '';
+      const st = Estado.st, doente = (st.ausencias || []).find(a => a.tipo === 'atestado'), extra = ev.id === 'gripe' && doente ? `<p><b>${esc(Regras.CHAR[doente.id].nome)}</b> está de atestado.</p>` : '';
       const p = UI.html(`<div class="painel" style="left:250px;top:130px;width:460px"><div class="sub">EVENTO DO MÊS</div><div class="tit">${esc(ev.nome)}</div><p style="font-size:15px">${esc(ev.desc)}</p>${extra}<div style="text-align:right"><button class="btn verde">Ok</button></div></div>`);
       clique($('button', p), () => { p.remove(); if (ev.id === 'feriado') Som.stopMusic(); res(); });
+    });
+  },
+};
+
+/* ---------- "VÍDEO" DE QUEM ESTÁ AUSENTE (janelinha no escritório) ---------- */
+const Casa = {
+  ICONE: { atestado: '🤒', homeoffice: '💻', licenca: '👶', ferias: '🏖️', aniversario: '🎂' },
+  janelas(topo) {
+    const st = Estado.st, lista = (st.ausencias || []).filter(a => st.time.some(m => m.id === a.id));
+    lista.slice(0, 3).forEach((a, i) => {
+      const c = Regras.CHAR[a.id], info = Regras.AUSENCIAS[a.tipo];
+      const el = UI.html(`<div class="video" style="left:${12 + i * 224}px;top:${topo}px"><div class="vbar"><span class="rec-dot"></span>AO VIVO · casa de ${esc(c.nome)}<span class="vx">✕</span></div><canvas width="64" height="40" class="px"></canvas>
+        <div class="vleg"><b>${this.ICONE[a.tipo]} ${esc(c.nome)}: ${esc(info.nome)}</b> (${esc(info.motivo)})<br><span>${esc(info.desc)} Não pode ser escalado(a).</span></div></div>`);
+      const g = el.querySelector('canvas').getContext('2d'), t0 = performance.now();
+      const desenhar = () => { try { Arte.desenharCasa(g, a.tipo, a.id, performance.now() - t0); } catch (e) { } };
+      desenhar(); UI.timers.push(setInterval(desenhar, 90));
+      el.querySelector('.vx').addEventListener('click', () => { Som.sfx('grampo'); el.remove(); });
+      el.addEventListener('mouseenter', () => Som.sfx('folha'));
     });
   },
 };
@@ -269,7 +287,7 @@ const Hub = {
   abrir() {
     const st = Estado.st; st.fase = 'hub'; Estado.salvar();
     UI.limpar();
-    if (Cena.nome !== 'escritorio') { Cena.setar('escritorio', 'andar'); st.time.forEach(m => Cena.ator(m.id, 20 + Math.random() * 260, 125 + Math.random() * 45)); }
+    if (Cena.nome !== 'escritorio') { Cena.setar('escritorio', 'andar'); st.time.filter(m => !Regras.ausencia(st, m.id)).forEach(m => Cena.ator(m.id, 20 + Math.random() * 260, 125 + Math.random() * 45)); }
     Som.stopMusic(); Som.ambient(true);
     UI.barra(); UI.engrenagem();
     const b = Regras.boss(st);
@@ -277,6 +295,7 @@ const Hub = {
       <div style="font-size:11px">Fraco: ${b.fraco.length ? b.fraco.map(badgeArea).join('') : '<i>muda toda semana</i>'}</div><div style="font-size:11px;margin-top:3px">Resiste: ${b.resiste.length ? b.resiste.map(badgeArea).join('') : '<i>—</i>'}</div></div>`);
     $('.bx', c).appendChild(bossEl(b.id, 1));
     if (st.evento) UI.html(`<div class="painel" style="left:12px;top:58px;width:260px;font-size:12px;padding:8px"><b>Evento:</b> ${esc(Regras.EVENTO[st.evento].nome)}<br><span class="sub">${esc(Regras.EVENTO[st.evento].desc)}</span></div>`);
+    Casa.janelas(st.evento ? 168 : 58);
     const menu = UI.html(`<div style="position:absolute;left:12px;bottom:14px;display:flex;gap:12px"></div>`);
     const add = (t, sub, cls, fn) => { const bt = document.createElement('button'); bt.className = 'btn grande ' + cls; bt.innerHTML = t + `<div style="font-size:11px;font-weight:normal;text-transform:none">${sub}</div>`; menu.appendChild(clique(bt, fn)); };
     add('🛒 Mercado', `${st.mercado.length} candidatos · time ${st.time.length}/6`, '', () => Mercado.abrir());
@@ -415,7 +434,7 @@ const Treino = {
 const Escalacao = {
   abrir() {
     const st = Estado.st; UI.limpar(); Cena.setar('reuniao'); Som.ambient(false); Som.music('escalacao');
-    st.escalacao = st.escalacao.filter(id => st.time.some(m => m.id === id) && id !== st.atestado);
+    st.escalacao = st.escalacao.filter(id => st.time.some(m => m.id === id) && !Regras.ausencia(st, id));
     this.render();
   },
   render() {
@@ -427,10 +446,10 @@ const Escalacao = {
     $('.bx', bc).appendChild(bossEl(b.id, 1));
     const tp = UI.html(`<div class="painel" style="left:352px;top:54px;width:598px"><div class="row" style="justify-content:space-between"><div class="tit">Escalação</div><span class="sub">Clique para escalar até 4. A ordem de clique é a ordem de ação.</span></div><div class="lista-time" style="margin-top:6px"></div></div>`);
     st.time.forEach(m => {
-      const c = Regras.CHAR[m.id], idx = st.escalacao.indexOf(m.id), atest = st.atestado === m.id;
+      const c = Regras.CHAR[m.id], idx = st.escalacao.indexOf(m.id), aus = Regras.ausencia(st, m.id), atest = !!aus;
       const fr = b.fraco.includes(c.area) ? '<b style="color:#c05000">★ FRACO</b>' : b.resiste.includes(c.area) ? '<span style="color:#7a7a90">▼ RESISTE</span>' : '';
       const l = document.createElement('div'); l.className = 'linha' + (idx >= 0 ? ' sel' : '') + (atest ? ' bloq' : '');
-      l.innerHTML = `<span class="num-ord">${idx >= 0 ? idx + 1 : ''}</span><span class="rt"></span><div style="width:110px"><b>${esc(c.nome)}</b><br>${badgeArea(c.area)}<span style="font-size:10px">${Regras.NIVEIS[c.nivel]}</span></div><div style="width:70px">${fr}</div><div style="flex:1">${statsHTML(m)}</div><div style="width:150px;font-size:10px;color:#7a2a3a">${atest ? '<b>DE ATESTADO</b>' : esc(c.desv)}${st.mentor === m.id && st.mentoria ? '<br><b style="color:var(--verde)">MENTOR</b>' : ''}</div>`;
+      l.innerHTML = `<span class="num-ord">${idx >= 0 ? idx + 1 : ''}</span><span class="rt"></span><div style="width:110px"><b>${esc(c.nome)}</b><br>${badgeArea(c.area)}<span style="font-size:10px">${Regras.NIVEIS[c.nivel]}</span></div><div style="width:70px">${fr}</div><div style="flex:1">${statsHTML(m)}</div><div style="width:150px;font-size:10px;color:#7a2a3a">${atest ? `<b>${Casa.ICONE[aus]} ${esc(Regras.AUSENCIAS[aus].nome.toUpperCase())}</b><br>${esc(Regras.AUSENCIAS[aus].motivo)}` : esc(c.desv)}${st.mentor === m.id && st.mentoria ? '<br><b style="color:var(--verde)">MENTOR</b>' : ''}</div>`;
       $('.rt', l).appendChild(retratoEl(m.id, 'neutro', 1));
       l.style.cursor = atest ? 'not-allowed' : 'pointer';
       l.addEventListener('click', () => {

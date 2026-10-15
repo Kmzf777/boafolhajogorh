@@ -674,6 +674,94 @@ const Arte = (() => {
     return (cacheCena[nome] = cv);
   }
 
-  return { retrato, retratoCanvas, corpoCanvas, bossCanvas, bossBranco, cenaCanvas, flipCanvas, cinza, texto, larguraTexto, shade, painter,
+  /* ---------- "VÍDEO" DE QUEM ESTÁ EM CASA (64x40, animado) ---------- */
+  function miniPessoa(g, id, x, y, o = {}) { // cabeça 8x8 + tronco; o: {olhos:'abertos'|'fechados', sem:'tronco', oculos:true}
+    const l = LOOKS[id], [sk, sd] = PELES[l.pele], c = l.cc, R = (a, b, w, h, cor) => { g.fillStyle = cor; g.fillRect(x + a, y + b, w, h); };
+    if (['longo', 'franja', 'chanel', 'afro', 'cacheado', 'volume'].includes(l.cab)) R(-1, 0, 10, 8, shade(c, -0.2));
+    if (!o.semTronco) { R(-1, 8, 10, 6, l.roupa); R(6, 8, 3, 6, shade(l.roupa, -0.25)); if (l.gravata) R(3, 8, 2, 4, l.gravata); }
+    R(0, 1, 8, 7, sk); R(6, 2, 2, 6, sd);
+    if (l.cab !== 'careca' && l.cab !== 'raspado' && l.cab !== 'ralo') R(0, 0, 8, 2, c);
+    if (l.cab === 'afro' || l.cab === 'cacheado' || l.cab === 'volume') R(-1, -1, 10, 3, c);
+    if (l.cab === 'coque') R(2, -2, 4, 2, c);
+    if (l.cab === 'topete') R(1, -1, 5, 1, c);
+    if (o.olhos === 'fechados') { R(1, 4, 2, 1, '#1a1a2e'); R(5, 4, 2, 1, '#1a1a2e'); }
+    else { R(2, 4, 1, 1, '#1a1a2e'); R(5, 4, 1, 1, '#1a1a2e'); }
+    if (l.oculos || o.oculos) R(1, 4, 6, 1, o.oculos ? '#101018' : '#2a2a3a');
+    if (o.oculos) { R(1, 3, 3, 2, '#101018'); R(4, 3, 3, 2, '#101018'); }
+  }
+  const CASA = {
+    atestado(g, t, id) {
+      const R = (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(x, y, w, h); };
+      R(0, 0, 64, 40, '#2a3a6a'); R(0, 28, 64, 12, '#3a2a4a');
+      R(44, 4, 14, 11, '#101830'); R(45, 5, 12, 9, '#1a2a5a'); R(52, 6, 3, 3, '#fff6c0'); R(51, 7, 1, 1, '#fff6c0');
+      R(4, 20, 40, 10, '#e8e8f0'); R(2, 16, 4, 16, '#7a4018'); R(42, 20, 3, 12, '#7a4018');
+      R(6, 17, 10, 5, '#ffffff');
+      miniPessoa(g, id, 7, 13, { olhos: 'fechados', semTronco: true });
+      R(14, 20, 30, 9, '#e63946'); R(14, 20, 30, 2, '#ff6b6b'); for (let x = 16; x < 44; x += 6) R(x, 24, 3, 1, '#a01828');
+      R(7, 13, 8, 2, '#d8f0ff');
+      R(10, 19, 1, 1, '#ff7a7a'); R(13, 19, 1, 1, '#ff7a7a');
+      R(14, 18, 5, 1, '#ffffff'); R(18, 18, 1, 1, '#e63946');
+      R(48, 24, 12, 8, '#a86028'); R(49, 20, 4, 4, '#ffffff'); R(53, 21, 5, 3, '#80c0ff');
+      const s = (t / 900) % 1;
+      [0, 0.33, 0.66].forEach((o, i) => { const p = (s + o) % 1; g.globalAlpha = 1 - p; R(18 + i * 3 + p * 6, 12 - p * 12, 3, 1, '#fff'); R(18 + i * 3 + p * 6, 12 - p * 12, 1, 3, '#fff'); R(18 + i * 3 + p * 6, 14 - p * 12, 3, 1, '#fff'); g.globalAlpha = 1; });
+      if (Math.floor(t / 500) % 2) { R(30, 2, 13, 7, '#1a1a2e'); texto(g, '39º', 31, 3, '#ff4040'); }
+      g.globalAlpha = 0.5 + 0.3 * Math.sin(t / 300); R(50, 17, 1, 2, '#fff'); R(52, 16, 1, 3, '#fff'); g.globalAlpha = 1;
+    },
+    homeoffice(g, t, id) {
+      const R = (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(x, y, w, h); };
+      R(0, 0, 64, 40, '#f0d8a8'); for (let x = 0; x < 64; x += 8) R(x, 0, 1, 26, '#e8c890');
+      R(4, 4, 14, 10, '#7ac8f0'); R(4, 4, 14, 1, '#ffffff'); R(10, 4, 1, 10, '#ffffff');
+      R(50, 8, 6, 10, '#2fbf71'); R(51, 18, 4, 5, '#e07a3a');
+      miniPessoa(g, id, 28, 10);
+      const dig = Math.floor(t / 120) % 2; R(26 + dig, 22, 3, 2, PELES[LOOKS[id].pele][0]); R(36 - dig, 22, 3, 2, PELES[LOOKS[id].pele][0]);
+      R(0, 24, 64, 16, '#a86028'); R(0, 24, 64, 2, '#c88040');
+      R(22, 16, 20, 9, '#30343f'); R(23, 17, 18, 7, '#4a90d0');
+      const sp = Math.floor(t / 150) % 4; texto(g, 'VPN', 25, 18, '#ffffff'); R(38, 18 + sp, 2, 2, '#ffd166');
+      R(20, 25, 24, 2, '#50545f');
+      if (Math.floor(t / 400) % 2) { R(46, 2, 10, 8, '#1a1a2e'); R(48, 7, 2, 1, '#ffffff'); R(47, 5, 4, 1, '#ffffff'); R(46, 3, 6, 1, '#ffffff'); R(52, 3, 4, 4, '#e63946'); R(53, 4, 2, 2, '#ffffff'); }
+      const gx = 2 + ((t / 40) % 80) - 10;
+      R(gx, 20, 8, 4, '#3a3a40'); R(gx + 7, 18, 3, 3, '#3a3a40'); R(gx + 7, 17, 1, 1, '#3a3a40'); R(gx + 9, 17, 1, 1, '#3a3a40'); R(gx - 2, 18 + (Math.floor(t / 200) % 2), 2, 2, '#3a3a40'); R(gx + 8, 19, 1, 1, '#9aff70');
+      R(gx + 1, 24, 1, 1, '#3a3a40'); R(gx + 6, 24, 1, 1, '#3a3a40');
+    },
+    licenca(g, t, id) {
+      const R = (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(x, y, w, h); };
+      R(0, 0, 64, 40, '#ffd0e4'); for (let y = 0; y < 30; y += 6) R(0, y, 64, 1, '#ffe4f0'); R(0, 30, 64, 10, '#c8a8e8');
+      R(42, 18, 18, 12, '#ffffff'); for (let x = 43; x < 60; x += 3) R(x, 18, 1, 12, '#e0d0f0'); R(42, 30, 2, 4, '#c0b0d0'); R(58, 30, 2, 4, '#c0b0d0');
+      const a = t / 500; R(50, 2, 1, 6, '#888');
+      [[-6, '#ffd166'], [0, '#5ab4ff'], [6, '#7fe8a8']].forEach(([dx, c], i) => { const x = 50 + Math.round(Math.cos(a + i * 2) * 6); R(x, 8 + i % 2, 3, 3, c); });
+      const sw = Math.round(Math.sin(t / 400) * 2);
+      miniPessoa(g, id, 16 + sw, 12);
+      R(18 + sw, 21, 10, 5, '#ffffff'); R(19 + sw, 20, 4, 4, '#ffe0c4'); R(20 + sw, 21, 1, 1, '#1a1a2e'); R(22 + sw, 21, 1, 1, '#1a1a2e');
+      R(14 + sw, 26, 12, 4, shade(LOOKS[id].roupa, -0.5));
+      const p = (t / 1400) % 1; g.globalAlpha = 1 - p; R(30, 16 - p * 14, 2, 2, '#ff4080'); R(32, 16 - p * 14, 2, 2, '#ff4080'); R(31, 18 - p * 14, 2, 1, '#ff4080'); g.globalAlpha = 1;
+      if (Math.floor(t / 600) % 2) { R(10, 4, 1, 5, '#a03a6a'); R(10, 4, 3, 1, '#a03a6a'); R(8, 8, 2, 2, '#a03a6a'); }
+    },
+    ferias(g, t, id) {
+      const R = (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(x, y, w, h); };
+      R(0, 0, 64, 18, '#7ad0ff'); R(0, 0, 64, 6, '#5ab8f0'); R(48, 3, 7, 7, '#ffe060'); R(47, 5, 9, 3, '#ffe060');
+      R(0, 18, 64, 7, '#2a90d0'); const o = Math.floor(t / 250) % 4; for (let x = -4; x < 64; x += 8) R(x + o * 2, 20 + (x / 8) % 2, 4, 1, '#c8f0ff');
+      R(0, 25, 64, 15, '#f4d88a'); for (let i = 0; i < 12; i++) R((i * 23) % 64, 28 + (i * 7) % 10, 1, 1, '#d8b860');
+      R(10, 4, 1, 22, '#7a4018'); R(1, 2, 20, 4, '#e63946'); R(3, 1, 16, 1, '#e63946'); for (let x = 1; x < 21; x += 6) R(x, 2, 3, 4, '#ffffff');
+      R(20, 30, 22, 3, '#ff8c32'); R(36, 24, 3, 7, '#ff8c32'); R(22, 33, 1, 4, '#8a5a30'); R(38, 33, 1, 4, '#8a5a30');
+      miniPessoa(g, id, 30, 19, { oculos: true, semTronco: true });
+      R(24, 27, 10, 4, LOOKS[id].roupa === '#f0f0f0' ? '#ff6aa8' : '#ffd23a');
+      R(44, 26, 5, 5, '#5a3a1a'); R(45, 25, 3, 1, '#2fbf71'); R(48, 22, 1, 4, '#ff6aa8');
+      if (Math.floor(t / 900) % 2) { R(52, 30, 10, 7, '#1a1a2e'); R(53, 31, 8, 5, '#3a3a50'); R(54, 32, 6, 1, '#e63946'); R(56, 34, 2, 1, '#e63946'); }
+    },
+    aniversario(g, t, id) {
+      const R = (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(x, y, w, h); };
+      R(0, 0, 64, 40, '#3a2470'); for (let x = 0; x < 64; x += 4) R(x, 0, 2, 2, ['#ffd166', '#ff6b6b', '#5ab4ff', '#7fe8a8'][(x / 4) % 4]);
+      [[6, '#ff6b6b'], [54, '#5ab4ff'], [14, '#ffd166']].forEach(([x, c], i) => { const y = 6 + Math.round(Math.sin(t / 500 + i) * 2); R(x, y, 6, 7, c); R(x + 1, y + 1, 2, 2, '#ffffff'); R(x + 3, y + 7, 1, 8, '#ffffff'); });
+      miniPessoa(g, id, 28, 10);
+      R(30, 4, 4, 2, '#ff40a0'); R(31, 2, 2, 2, '#ff40a0'); R(31, 1, 2, 1, '#ffd166'); R(30, 5, 4, 1, '#ffd166');
+      R(0, 26, 64, 14, '#a86028'); R(0, 26, 64, 2, '#c88040');
+      R(22, 20, 20, 7, '#ffffff'); R(22, 20, 20, 2, '#ff9ac0'); R(22, 24, 20, 1, '#ff6aa8');
+      [25, 31, 37].forEach((x, i) => { R(x, 16, 1, 4, '#5ab4ff'); const f = Math.floor(t / 120 + i) % 3; R(x - (f === 1 ? 1 : 0), 14 + (f === 2 ? 1 : 0), 1 + (f === 1 ? 1 : 0), 2, f ? '#ffd166' : '#ff8c32'); });
+      for (let i = 0; i < 14; i++) { const y = ((t / 30 + i * 37) % 44) - 4, x = (i * 29 + Math.sin(t / 300 + i) * 3) % 64; R(Math.round(x), Math.round(y), 1, 2, ['#ffd166', '#ff6b6b', '#5ab4ff', '#7fe8a8', '#ffffff'][i % 5]); }
+    },
+  };
+  function desenharCasa(g, tipo, id, t) { g.imageSmoothingEnabled = false; (CASA[tipo] || CASA.atestado)(g, t, id); }
+
+  return { desenharCasa, retrato, retratoCanvas, corpoCanvas, bossCanvas, bossBranco, cenaCanvas, flipCanvas, cinza, texto, larguraTexto, shade, painter,
     ARENA_DO_CHEFE, AURA, CORES_AREA, LOOKS, toCanvas, Bf };
 })();

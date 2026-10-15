@@ -13,7 +13,7 @@ const Regras = (() => {
     hardBase: 3, softBase: 2, softFixo: 2,
     multFraco: 2, multResiste: 0.5,
     sinergiaMin: 3, chanceDemissaoSenior: 0.25,
-    hpEscala: 1, precoCurso: 4, maxCursosMes: 3,
+    hpEscala: 1, precoCurso: 4, maxCursosMes: 3, chanceAusencia: 0.25, minTimeAusencia: 4,
   };
   const AREAS = { FIN: 'Financeiro', DAD: 'Dados', JUR: 'Jurídico', TEC: 'Tecnologia', VEN: 'Vendas', OPE: 'Operações' };
   const NIVEIS = { J: 'Júnior', P: 'Pleno', S: 'Sênior' };
@@ -84,6 +84,15 @@ const Regras = (() => {
     { id: 'tranquilo', nome: 'Mês tranquilo', desc: 'Ar-condicionado zumbindo, passarinho cantando. Nada de especial acontece.' },
   ];
   const EVENTO = Object.fromEntries(EVENTOS.map(e => [e.id, e]));
+  // Ausências: quem está ausente não pode ser escalado no mês
+  const AUSENCIAS = {
+    atestado: { nome: 'De atestado', motivo: 'gripe forte', desc: 'Febre de 39º. Volta no mês que vem.' },
+    homeoffice: { nome: 'Home office', motivo: 'a VPN caiu', desc: 'Tá trabalhando... em tese. A internet não colabora.' },
+    licenca: { nome: 'De licença', motivo: 'bebê novo na família', desc: 'Licença-maternidade/paternidade. Fraldas > planilhas.' },
+    ferias: { nome: 'De férias', motivo: 'férias vencidas', desc: 'Celular desligado. Não adianta mandar áudio.' },
+    aniversario: { nome: 'Folga de aniversário', motivo: 'é o dia dele(a)!', desc: 'Day off de aniversário. Parabéns, sem crachá hoje.' },
+  };
+  const ausencia = (st, id) => { const a = (st.ausencias || []).find(x => x.id === id); return a ? a.tipo : null; };
 
   /* ---------- utilidades ---------- */
   const d6 = rng => 1 + Math.floor(rng() * 6);
@@ -98,21 +107,24 @@ const Regras = (() => {
   /* ---------- ciclo do ano ---------- */
   function novoJogo() {
     return { v: 1, mes: 0, caixa: CFG.caixaInicial, derrotas: 0, vitorias: 0, pt: 0, time: CFG.timeInicial.map(membro),
-      evento: null, atestado: null, mercado: [], cursos: 0, mentoria: false, mentor: null, treinoFeito: false, escalacao: [], fase: 'inicioMes', fim: null, historico: [] };
+      evento: null, ausencias: [], mercado: [], cursos: 0, mentoria: false, mentor: null, treinoFeito: false, escalacao: [], fase: 'inicioMes', fim: null, historico: [] };
   }
   // Prepara o mês: evento + mercado. Retorna o evento (ou null).
   function iniciarMes(st, rng = Math.random) {
-    st.evento = null; st.atestado = null; st.cursos = 0; st.mentoria = false; st.mentor = null; st.treinoFeito = false;
+    st.evento = null; st.ausencias = []; st.cursos = 0; st.mentoria = false; st.mentor = null; st.treinoFeito = false;
     if (st.mes > 0) {
       const ev = pick(EVENTOS, rng); st.evento = ev.id;
       if (ev.id === 'corte') st.caixa -= 6;
       if (ev.id === 'elogio') st.caixa += 8;
       if (ev.id === 'verba') st.pt += 3;
-      if (ev.id === 'gripe' && st.time.length > 1) st.atestado = pick(st.time, rng).id;
+      if (ev.id === 'gripe' && st.time.length > 1) st.ausencias.push({ id: pick(st.time, rng).id, tipo: 'atestado' });
+      const livres = st.time.filter(m => !ausencia(st, m.id));
+      if (st.time.length >= CFG.minTimeAusencia && livres.length > 3 && rng() < CFG.chanceAusencia)
+        st.ausencias.push({ id: pick(livres, rng).id, tipo: pick(['homeoffice', 'licenca', 'ferias', 'aniversario'], rng) });
     }
     const livres = CHARS.filter(c => !st.time.some(m => m.id === c.id)).map(c => c.id);
     st.mercado = shuffle(livres, rng).slice(0, CFG.ofertasMercado);
-    st.escalacao = st.time.filter(m => m.id !== st.atestado).slice(0, CFG.maxCampo).map(m => m.id);
+    st.escalacao = st.time.filter(m => !ausencia(st, m.id)).slice(0, CFG.maxCampo).map(m => m.id);
     st.fase = 'hub';
     return st.evento ? EVENTO[st.evento] : null;
   }
@@ -157,7 +169,7 @@ const Regras = (() => {
     st.pt -= custo; m[stat]++; return null;
   }
   function escalar(st, ids) {
-    const v = ids.filter((id, i) => ids.indexOf(id) === i && st.time.some(m => m.id === id) && id !== st.atestado).slice(0, CFG.maxCampo);
+    const v = ids.filter((id, i) => ids.indexOf(id) === i && st.time.some(m => m.id === id) && !ausencia(st, id)).slice(0, CFG.maxCampo);
     st.escalacao = v; return v;
   }
 
@@ -332,7 +344,7 @@ const Regras = (() => {
     return rel;
   }
 
-  return { CFG, AREAS, NIVEIS, CHARS, CHAR, BOSSES, MESES, EVENTOS, EVENTO, novoJogo, iniciarMes, podeContratar, contratar, demitir,
+  return { CFG, AREAS, NIVEIS, CHARS, CHAR, BOSSES, MESES, EVENTOS, EVENTO, AUSENCIAS, ausencia, novoJogo, iniciarMes, podeContratar, contratar, demitir,
     custoContratar, folha, salarioDe, boss, resultadoTreino, treinar, comprarCurso, escalar, iniciarCombate, semana, fimMes, multArea, shuffle, d6 };
 })();
 if (typeof module !== 'undefined') module.exports = Regras;
