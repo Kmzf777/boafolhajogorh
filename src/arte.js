@@ -534,6 +534,35 @@ const Arte = (() => {
       rect(b, 41, 80, 3, 2, RP.ouro[3]); rect(b, 69, 80, 3, 2, RP.ouro[3]);
     },
   };
+  // Enzo, o Filho do Dono: colete puffer, moletom, topete, óculos na cabeça, fone sem fio, selfie e café gelado
+  BOSS_DRAW.filho = function (b, f) {
+    cyl(b, 42, 92, 11, 18, RP.azul, -1); cyl(b, 59, 92, 11, 18, RP.azul, -1);
+    for (let y = 96; y < 108; y += 4) { st(b, 45, y, RP.azul[4]); st(b, 63, y + 2, RP.azul[4]); }
+    ell(b, 46, 113, 9, 4.5, RP.branco); ell(b, 66, 113, 9, 4.5, RP.branco, -1); rect(b, 38, 114, 17, 2, RP.verm[2]); rect(b, 58, 114, 17, 2, RP.verm[2]);
+    cyl(b, 38, 50, 36, 46, RP.cinza, 1);
+    box(b, 30, 50, 16, 44, RP.laranja, 0, 3); box(b, 66, 50, 16, 44, RP.laranja, -1, 3);
+    for (let y = 56; y < 92; y += 6) { rect(b, 31, y, 14, 1, RP.laranja[1]); rect(b, 67, y, 14, 1, RP.laranja[1]); }
+    rect(b, 46, 52, 2, 40, RP.preto[2]); rect(b, 64, 52, 2, 40, RP.preto[2]);
+    poly(b, [[48, 50], [64, 50], [56, 58]], RP.cinza, 2);
+    ell(b, 92, 46, 6, 14, RP.laranja, -1); ell(b, 94, 30, 5, 5, RP.pele1);
+    box(b, 90, 12, 11, 20, RP.preto, 0, 1);
+    ell(b, 22, 76, 6, 14, RP.laranja); ell(b, 22, 90, 5, 5, RP.pele1);
+    box(b, 15, 76, 13, 18, RP.bege, 1, 1); rect(b, 16, 74, 11, 2, RP.branco[3]);
+    cyl(b, 50, 40, 12, 10, RP.pele1, -1);
+    ell(b, 56, 30, 13, 15, RP.pele1);
+    ell(b, 43, 31, 3, 5, RP.pele1); ell(b, 69, 31, 3, 5, RP.pele1, -1);
+    ell(b, 56, 14, 13, 8, RP.cabelo); ell(b, 60, 8, 10, 6, RP.cabelo, 1); ell(b, 44, 22, 2, 5, RP.cabelo, -2); ell(b, 68, 22, 2, 5, RP.cabelo, -2);
+    outl(b);
+    rect(b, 45, 15, 9, 4, D); rect(b, 58, 15, 9, 4, D); rect(b, 54, 16, 4, 1, D); st(b, 46, 15, '#ffffff'); st(b, 59, 15, '#ffffff');
+    rect(b, 42, 31, 2, 3, '#ffffff'); rect(b, 69, 31, 2, 3, '#ffffff');
+    line(b, 47, 24, 53, 23, D); line(b, 59, 22, 65, 24, D);
+    rect(b, 48, 27, 3, 2, D); rect(b, 61, 27, 3, 2, D); st(b, 48, 27, '#ffffff'); st(b, 61, 27, '#ffffff');
+    line(b, 52, 36, 59, 36, '#7a2a2a'); line(b, 59, 36, 62, 34, '#7a2a2a');
+    for (let x = 48; x <= 64; x++) st(b, x, 51 + Math.round(Math.abs(56 - x) * 0.35), RP.ouro[x % 2 ? 3 : 2]);
+    rect(b, 92, 14, 7, 15, f ? '#80d0ff' : '#c0e8ff'); rect(b, 94, 17, 3, 3, '#ffd23a'); rect(b, 93, 24, 5, 1, '#ff40a0');
+    rect(b, 17, 80, 9, 12, '#6a4020'); rect(b, 17, 80, 9, 3, '#a87040'); rect(b, 22, 64, 1, 12, '#2fbf71'); ell(b, 21, 86, 2.5, 2.5, RP.verde, 1);
+    if (f) { rect(b, 103, 8, 2, 2, '#ffffff'); rect(b, 106, 11, 2, 2, '#ffffff'); }
+  };
   const cacheBoss = {};
   function bossCanvas(id, f = 0) {
     const k = id + f; if (cacheBoss[k]) return cacheBoss[k];
@@ -542,7 +571,7 @@ const Arte = (() => {
   }
   const cacheBossBranco = {};
   function bossBranco(id) { return cacheBossBranco[id] || (cacheBossBranco[id] = branco(bossCanvas(id, 0))); }
-  const AURA = { osvaldo: '#ff9a3a', ponto: '#5aff70', clotilde: '#c080ff', leao: '#ffd040', cliente: '#ff5a5a', conselho: '#ff4060', excel: '#40ff90', valdemar: '#a0a0ff', auditor: '#e8dcb0', pendrive: '#b040ff', impressora: '#ff70c0', ceo: '#ffe060' };
+  const AURA = { osvaldo: '#ff9a3a', ponto: '#5aff70', clotilde: '#c080ff', leao: '#ffd040', cliente: '#ff5a5a', conselho: '#ff4060', excel: '#40ff90', valdemar: '#a0a0ff', auditor: '#e8dcb0', pendrive: '#b040ff', impressora: '#ff70c0', ceo: '#ffe060', filho: '#40e0ff' };
 
   /* ---------- CENÁRIOS 320x180 ---------- */
   function cena(w = 320, h = 180) { const cv = document.createElement('canvas'); cv.width = w; cv.height = h; const g = cv.getContext('2d'); return { cv, g }; }

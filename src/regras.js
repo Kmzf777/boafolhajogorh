@@ -13,6 +13,7 @@ const Regras = (() => {
     hardBase: 3, softBase: 2, softFixo: 2,
     multFraco: 2, multResiste: 0.5,
     sinergiaMin: 3, chanceDemissaoSenior: 0.25,
+    chanceFilho: 0.045, forcaFilho: 1.1, curaFilho: 0.05,
     hpEscala: 1, precoCurso: 4, maxCursosMes: 3, chanceAusencia: 0.25, minTimeAusencia: 4,
   };
   const AREAS = { FIN: 'Financeiro', DAD: 'Dados', JUR: 'Jurídico', TEC: 'Tecnologia', VEN: 'Vendas', OPE: 'Operações' };
@@ -71,6 +72,11 @@ const Regras = (() => {
     { id: 'ceo', nome: 'O CEO', titulo: 'Chefe Final do Board', tipo: 'boss', hp: 290, fraco: [], resiste: [], pressao: [3, 2], esp: 'board',
       espDesc: 'A fraqueza muda toda semana, e a área da semana anterior vira resistência. Recupera 10% da vida na semana 2.', entrada: '(tosse) Então vocês são o RH.', vence: 'Reestruturação. Vocês entendem.', perde: 'Funcionários do ano. Bom trabalho.' },
   ];
+  // Chefe surpresa: substitui o chefe da fase por 1 semana (4,5% por semana, no máximo 1x por mês)
+  const FILHO = { id: 'filho', nome: 'Enzo', titulo: 'O Filho do Dono · CEO da própria startup (0 clientes)', tipo: 'boss', fraco: ['JUR', 'OPE'], resiste: ['VEN', 'TEC'], esp: 'filho',
+    espDesc: '10% mais forte. Post no LinkedIn: alguém perde a semana gravando vídeo pra ele. Reunião Geral: estresse em todo o time. Cartão do Pai: recupera 5% da vida.',
+    entrada: 'E aí, galera! Meu pai pediu pra eu dar uma olhada aqui.', sai: 'Fui, tenho crossfit. Depois a gente faz um call.',
+    perde: 'Vou contar pro meu pai!' };
   const MESES = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 
   const EVENTOS = [
@@ -194,7 +200,13 @@ const Regras = (() => {
     const ev = [];
     if (cb.fim) return ev;
     cb.semana++;
-    const b = BOSSES.find(x => x.id === cb.bossId);
+    const pai = BOSSES.find(x => x.id === cb.bossId);
+    const filho = !cb.filhoVeio && rng() < CFG.chanceFilho;
+    const b = filho ? { ...FILHO, pressao: [99, pai.pressao[1]] } : pai;
+    let guarda = null;
+    if (filho) { cb.filhoVeio = true; cb.filhoAgora = true; guarda = { fraco: cb.fraco, resiste: cb.resiste }; cb.fraco = FILHO.fraco.slice(); cb.resiste = FILHO.resiste.slice(); }
+    const fimDoFilho = () => { if (!filho) return; cb.fraco = guarda.fraco; cb.resiste = guarda.resiste; cb.filhoAgora = false; ev.push({ t: 'filho', sai: true, fraco: cb.fraco, resiste: cb.resiste }); };
+    cb.travada = null;
     // efeitos de início de semana
     if (b.esp === 'trava') { cb.travada = pick(Object.keys(AREAS), rng); ev.push({ t: 'especial', texto: 'TRAVOU! A área ' + cb.travada + ' não causa dano nesta semana.' }); }
     if (b.esp === 'board') {
@@ -204,6 +216,11 @@ const Regras = (() => {
       ev.push({ t: 'especial', texto: 'Nova pauta do Board: agora o CEO é fraco contra ' + cb.fraco[0] + (cb.resiste.length ? ' e resiste a ' + cb.resiste[0] : '') + '.' });
     }
     ev.push({ t: 'semana', n: cb.semana, prazo: cb.prazo });
+    if (filho) {
+      ev.push({ t: 'filho', entra: true, fraco: cb.fraco, resiste: cb.resiste });
+      const alvo = pick(cb.time.filter(u => !u.out), rng);
+      if (alvo) { alvo.postado = true; ev.push({ t: 'especial', texto: 'Post no LinkedIn! ' + CHAR[alvo.id].nome + ' vai passar a semana gravando vídeo pro Enzo.', who: alvo.id }); }
+    }
     const ativos = cb.time.filter(u => !u.out);
     let fila = ativos.slice();
     let mentoriaUsada = false, acertosFraco = 0, penalProx = null, metadeProx = false, pularProx = false;
@@ -214,6 +231,7 @@ const Regras = (() => {
       let tipo = ordens[u.id] === 'soft' ? 'soft' : 'hard';
       let area = c.area;
       const meu = { metade: false };
+      if (u.postado) { u.postado = false; ev.push({ t: 'perde', who: u.id, motivo: 'linkedin' }); continue; }
       if (pularProx) { pularProx = false; ev.push({ t: 'perde', who: u.id, motivo: 'reuniao' }); continue; }
       if (penalProx === 'dado') { u.dadoBonus -= 1; penalProx = null; }
       if (metadeProx) { meu.metade = true; metadeProx = false; }
@@ -265,6 +283,7 @@ const Regras = (() => {
       if (meu.metade) dano *= 0.5;
       if (u.danoX !== 1) { dano *= u.danoX; u.danoX = 1; }
       if (b.esp === 'recurso' && cb.semana === cb.prazo) dano *= 0.75;
+      if (filho) dano /= CFG.forcaFilho;
       if (falha) dano = 0;
       dano = Math.round(dano);
       // cura de estresse do Soft
@@ -299,16 +318,17 @@ const Regras = (() => {
       ev.push({ t: 'sinergia', dano: bonus, hp: cb.hp });
       if (cb.hp <= 0) cb.fim = { vitoria: true, semana: cb.semana };
     }
-    if (cb.fim) { ev.push({ t: 'fim', vitoria: true, semana: cb.semana, cedo: cb.prazo - cb.semana }); return ev; }
+    if (cb.fim) { cb.filhoAgora = false; ev.push({ t: 'fim', vitoria: true, semana: cb.semana, cedo: cb.prazo - cb.semana, filho }); return ev; }
     // turno do chefe
-    const cura = b.esp === 'meta' && cb.semana === 3 ? 0.15 : b.esp === 'malha' && cb.semana === 2 ? 0.2 : b.esp === 'virus' ? 0.08 : b.esp === 'board' && cb.semana === 2 ? 0.1 : 0;
-    if (cura && cb.semana < cb.prazo) { const q = Math.round(cb.hpMax * cura); cb.hp = Math.min(cb.hpMax, cb.hp + q); ev.push({ t: 'cura', q, hp: cb.hp }); }
+    const cura = b.esp === 'filho' ? CFG.curaFilho : b.esp === 'meta' && cb.semana === 3 ? 0.15 : b.esp === 'malha' && cb.semana === 2 ? 0.2 : b.esp === 'virus' ? 0.08 : b.esp === 'board' && cb.semana === 2 ? 0.1 : 0;
+    if (cura && cb.semana < cb.prazo) { const q = Math.round(cb.hpMax * cura); cb.hp = Math.min(cb.hpMax, cb.hp + q); ev.push({ t: 'cura', q, hp: cb.hp, filho }); }
     if (b.esp === 'gerente') cb.pressaoExtra++;
     const [alvos, val] = b.pressao;
     const vivos = shuffle(cb.time.filter(x => !x.out), rng).slice(0, alvos + (b.esp === 'gerente' ? Math.floor(cb.pressaoExtra / 2) : 0));
     const golpes = vivos.map(x => { const q = val + (b.esp === 'gerente' && cb.pressaoExtra % 2 === 0 ? 1 : 0); x.estresse += q; return { who: x.id, q }; });
-    ev.push({ t: 'chefe', golpes });
+    ev.push({ t: 'chefe', golpes, filho });
     checaOut(cb, ev);
+    fimDoFilho();
     if (cb.semana >= cb.prazo || cb.time.every(x => x.out)) {
       cb.fim = { vitoria: false, semana: cb.semana };
       ev.push({ t: 'fim', vitoria: false, semana: cb.semana, motivo: cb.time.every(x => x.out) ? 'todos' : 'prazo' });
@@ -344,7 +364,7 @@ const Regras = (() => {
     return rel;
   }
 
-  return { CFG, AREAS, NIVEIS, CHARS, CHAR, BOSSES, MESES, EVENTOS, EVENTO, AUSENCIAS, ausencia, novoJogo, iniciarMes, podeContratar, contratar, demitir,
+  return { CFG, AREAS, NIVEIS, CHARS, CHAR, BOSSES, MESES, EVENTOS, EVENTO, FILHO, AUSENCIAS, ausencia, novoJogo, iniciarMes, podeContratar, contratar, demitir,
     custoContratar, folha, salarioDe, boss, resultadoTreino, treinar, comprarCurso, escalar, iniciarCombate, semana, fimMes, multArea, shuffle, d6 };
 })();
 if (typeof module !== 'undefined') module.exports = Regras;

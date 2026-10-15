@@ -87,8 +87,11 @@ const Cena = {
 };
 function loopCena() {
   let ult = performance.now();
-  const passo = agora => { const dt = Math.min(60, agora - ult); ult = agora; try { Cena.desenhar(dt); } catch (e) { console.error(e); } requestAnimationFrame(passo); };
+  const quadro = agora => { const dt = Math.min(60, agora - ult); ult = agora; try { Cena.desenhar(dt); } catch (e) { console.error(e); } };
+  const passo = agora => { quadro(agora); requestAnimationFrame(passo); };
   requestAnimationFrame(passo);
+  // com a aba escondida o navegador pausa o requestAnimationFrame: as animações seguem por aqui
+  setInterval(() => { const agora = performance.now(); if (agora - ult > 250) { const falta = agora - ult; ult = agora - Math.min(falta, 1000); while (agora - ult > 1) quadro(Math.min(agora, ult + 60)); } }, 200);
 }
 
 /* ---------- efeitos de tela (camada HTML) ---------- */
@@ -144,6 +147,7 @@ const FALAS = {
     pendrive: ['Copiando seus arquivos... HA HA!', 'Vírus detectado: você.', 'Formatar? Sim.'],
     impressora: ['Papel atolado na bandeja 2.', 'Ciano vazio. Esperança vazia.', 'Imprimindo... 0%.'],
     ceo: ['Vamos pensar fora da caixa. Vocês, dentro.', 'Reestruturação é uma palavra bonita.', '(olha o relógio)'],
+    filho: ['Tipo, vocês já ouviram falar de IA?', 'Meu pai disse que eu mando aqui. Então...', 'Bora fazer um brainstorm às 7h da manhã?', 'Isso daria um ótimo reels.', 'Na minha startup a gente não faz assim.'],
   },
 };
 const CARGO = { FIN: 'Financeiro', DAD: 'Dados', JUR: 'Jurídico', TEC: 'TI', VEN: 'Vendas', OPE: 'Operações' };
@@ -232,6 +236,7 @@ const Ajuda = {
     • <b>Sinergia:</b> 3 ou mais acertos de fraqueza na mesma semana dão dano bônus (soma do S do time × 2).<br>
     • No fim da semana o chefe cobra resultados: dá estresse. Quem chega ao limite (R) fica <b>fora</b> do combate.</p>
     <p><b>5. Fechamento:</b> vencer dá receita (mais R$ 3 mil por semana que sobrou no prazo). Depois vêm os salários. Ao perder, cada Sênior tem 25% de chance de pedir demissão.</p>
+    <p><b>Surpresa:</b> em qualquer semana há 4,5% de chance de aparecer <b>Enzo, o Filho do Dono</b> (24 anos), que substitui o chefe por uma semana. Ele é 10% mais forte, é fraco contra JUR e OPE e resiste a VEN e TEC. Faz alguém perder a semana gravando vídeo pro LinkedIn dele, estressa o time todo e usa o cartão do pai para recuperar vida.</p>
     <p><b>Fim de jogo:</b> caixa negativo depois da folha (falência) ou 4 derrotas = <b>bilhete azul</b>. Vencer o CEO em dezembro = <b>Funcionário do Ano</b>.</p>
     <div style="text-align:right"><button class="btn verde" id="ok">Entendi</button></div></div>`;
     document.getElementById('stage').appendChild(m); clique($('#ok', m), () => m.remove());
@@ -530,7 +535,8 @@ const Combate = {
     await esperar(1200);
     this.ocupado = false; this.render();
   },
-  falaChefe(t, ms = 1600) { const b = Regras.boss(Estado.st); FX.balao(200, 20, t, b.tipo, ms); },
+  tipoFala() { return Cena.boss && Cena.boss.id === 'filho' ? 'boss' : Regras.boss(Estado.st).tipo; },
+  falaChefe(t, ms = 1600) { FX.balao(196, 46, t, this.tipoFala(), ms); },
   ordemPadrao(u) {
     const c = Regras.CHAR[u.id], m = Regras.multArea(this.cb, c.area);
     if (u.id === 'pedro') return 'hard';
@@ -542,7 +548,7 @@ const Combate = {
     UI.limpar(); UI.engrenagem();
     UI.html(`<div id="semanaBox">SEMANA ${Math.min(cb.semana + 1, cb.prazo)}/${cb.prazo}</div>`);
     UI.html(`<div id="hpBox"><div class="nm">${esc(b.nome.toUpperCase())} <span class="tt">· ${esc(b.titulo)}</span></div><div class="hp"><div class="back" style="width:${cb.hp / cb.hpMax * 100}%"></div><div class="front" style="width:${cb.hp / cb.hpMax * 100}%"></div><div class="seg"></div><div class="txt">${cb.hp}/${cb.hpMax}</div></div>
-      <div style="font-size:11px;margin-top:3px">Fraco: ${cb.fraco.map(badgeArea).join('') || '?'} Resiste: ${cb.resiste.map(badgeArea).join('') || '—'}</div></div>`);
+      <div class="ar" style="font-size:11px;margin-top:3px">Fraco: ${cb.fraco.map(badgeArea).join('') || '?'} Resiste: ${cb.resiste.map(badgeArea).join('') || '—'}</div></div>`);
     if (semPainel) return;
     const pn = UI.html(`<div id="unidades"></div>`);
     cb.time.forEach(u => {
@@ -560,6 +566,24 @@ const Combate = {
     const go = document.createElement('button'); go.className = 'btn grande verde'; go.style.marginLeft = 'auto'; go.style.alignSelf = 'center';
     go.innerHTML = 'Executar<br>semana ▶'; go.disabled = this.ocupado;
     pn.appendChild(clique(go, () => this.executar()));
+  },
+  placa(nome, titulo) { const n = $('#hpBox .nm'); if (n) n.innerHTML = `${esc(nome.toUpperCase())} <span class="tt">· ${esc(titulo)}</span>`; },
+  badges(fraco, resiste) { const d = $('#hpBox .ar'); if (d) d.innerHTML = `Fraco: ${fraco.map(badgeArea).join('') || '?'} Resiste: ${resiste.map(badgeArea).join('') || '—'}`; },
+  async trocaFilho(e) {
+    const B = Cena.boss, pai = Regras.boss(Estado.st), F = Regras.FILHO;
+    if (e.entra) {
+      Som.sfx('bFilho'); FX.banner('ALERTA: FILHO DO DONO!', 'Enzo assumiu o lugar de ' + pai.nome + ' por uma semana');
+      Cena.tween(B, 'alpha', 0, 500); await Cena.tween(B, 'dx', 150, 500);
+      B.id = 'filho'; B.dx = 150; Cena.tween(B, 'alpha', 1, 500); await Cena.tween(B, 'dx', 0, 600);
+      B.tremor = 6; this.placa('Enzo, o Filho do Dono', 'no lugar do chefe · +10%'); this.badges(e.fraco, e.resiste);
+      await esperar(900); this.falaChefe(F.entrada, 2400); Som.say(F.entrada, 'boss', 0, { pitch: 1.5, rate: 1.2 }); await esperar(2300);
+      FX.num(B.x + 56, B.y + 30, 'Fraco: JUR e OPE<small>Resiste: VEN e TEC</small>', 'info'); await esperar(900);
+    } else {
+      this.falaChefe(F.sai, 1800); Som.say(F.sai, 'boss', 0, { pitch: 1.5, rate: 1.2 }); await esperar(1600);
+      Som.sfx('filhoSai'); Cena.tween(B, 'alpha', 0, 450); await Cena.tween(B, 'dx', 150, 450);
+      B.id = pai.id; Cena.tween(B, 'alpha', 1, 450); await Cena.tween(B, 'dx', 0, 550);
+      this.placa(pai.nome, pai.titulo); this.badges(e.fraco, e.resiste); FX.num(B.x + 56, B.y + 30, pai.nome + ' voltou', 'info'); await esperar(800);
+    }
   },
   atualizarHP(hp) {
     const cb = this.cb, w = hp / cb.hpMax * 100 + '%';
@@ -589,11 +613,11 @@ const Combate = {
           Som.setWeek(e.n); Som.sfx('segunda'); FX.banner('SEMANA ' + e.n, e.n === e.prazo ? 'ÚLTIMA SEMANA DO PRAZO!' : 'de ' + e.prazo);
           $('#semanaBox') && ($('#semanaBox').textContent = `SEMANA ${e.n}/${e.prazo}`); await esperar(1100); break;
         case 'especial':
-          this.falaChefe(e.texto, 1900); Som.say(e.texto.split('!')[0] + '!', b.tipo, 0, { v: 0.6 }); B.tremor = 4; await esperar(1700); break;
+          this.falaChefe(e.texto, 1900); Som.say(e.texto.split('!')[0] + '!', this.tipoFala(), 0, { v: 0.6, pitch: Cena.boss.id === 'filho' ? 1.5 : 1 }); B.tremor = 4; await esperar(1700); break;
         case 'desv':
           FX.balao(ax - 6, ay, e.texto, 'char', 1500); Som.sfx(somDesv(e.who)); a && (a.flash = 300); await esperar(1250); break;
         case 'perde': {
-          const mot = { reuniao: 'em reunião', lento: 'ligando o PC...', esqueceu: 'esqueceu o prazo', folga: 'de folga', analise: 'analisando...', escrito: 'esperando e-mail', refaz: 'refazendo...', digital: 'barrado na catraca', centralizador: 'o Fausto tomou a vez' }[e.motivo] || 'perdeu a vez';
+          const mot = { reuniao: 'em reunião', lento: 'ligando o PC...', esqueceu: 'esqueceu o prazo', folga: 'de folga', analise: 'analisando...', escrito: 'esperando e-mail', refaz: 'refazendo...', digital: 'barrado na catraca', centralizador: 'o Fausto tomou a vez', linkedin: 'gravando vídeo pro Enzo' }[e.motivo] || 'perdeu a vez';
           FX.num(ax, ay + 10, mot, 'info'); if (e.junto) { const a2 = this.atorDe(e.junto); a2 && FX.num(a2.x + 16, a2.y - 42, 'na reunião', 'info'); }
           await esperar(700); break;
         }
@@ -605,9 +629,11 @@ const Combate = {
           Som.sfx('sinergia'); FX.banner('SINERGIA!', 'TIME!'); await esperar(500);
           const [cx, cy] = centroBoss(); FX.num(cx, cy, e.dano + '<small>bônus do time</small>', 'fraco'); B.flash = 400; Cena.shake = 8; this.atualizarHP(e.hp); await esperar(900); break;
         }
-        case 'cura': { Som.sfx('retrabalho'); const [cx, cy] = centroBoss(); FX.num(cx, cy - 10, '+' + e.q + '<small>retrabalho</small>', 'cura'); this.atualizarHP(e.hp); await esperar(1000); break; }
+        case 'cura': { Som.sfx(e.filho ? 'dGloria' : 'retrabalho'); const [cx, cy] = centroBoss(); FX.num(cx, cy - 10, '+' + e.q + '<small>' + (e.filho ? 'cartão do pai' : 'retrabalho') + '</small>', 'cura'); this.atualizarHP(e.hp); await esperar(1000); break; }
+        case 'filho': await this.trocaFilho(e); break;
         case 'chefe': {
-          const fala = rnd(FALAS.provoca[b.id]); this.falaChefe(fala, 1500); Som.say(fala, b.tipo);
+          const fala = rnd(FALAS.provoca[e.filho ? 'filho' : b.id]); this.falaChefe(fala, 1500); Som.say(fala, e.filho ? 'boss' : b.tipo, 0, e.filho ? { pitch: 1.5, rate: 1.2 } : {});
+          if (e.filho) FX.banner('REUNIÃO GERAL!', 'estresse para todo o time');
           await Cena.tween(B, 'dx', -18, 160); Cena.shake = 5;
           for (const g of e.golpes) { const t = this.atorDe(g.who); if (!t) continue; t.flash = 500; FX.num(t.x + 16, t.y - 40, '+' + g.q + ' estresse', 'est'); Som.sfx('resistencia'); }
           this.atualizarUni(); await Cena.tween(B, 'dx', 0, 300); await esperar(900); break;
@@ -652,7 +678,8 @@ const Combate = {
     if (vit) {
       const cedo = cb.prazo - cb.fim.semana;
       if (cedo > 0) { Som.sfx('pontoCedo'); FX.banner('BATEU O PONTO CEDO!', '+' + cedo * Regras.CFG.bonusSemanaCedo + ' mil de bônus'); await esperar(1500); }
-      this.falaChefe(b.perde, 2000); Som.say(b.perde, b.tipo); await esperar(1600);
+      const ehFilho = Cena.boss.id === 'filho', perde = ehFilho ? Regras.FILHO.perde : b.perde;
+      this.falaChefe(perde, 2000); Som.say(perde, ehFilho ? 'boss' : b.tipo, 0, ehFilho ? { pitch: 1.5 } : {}); await esperar(1600);
       B.morto = true; for (let i = 0; i < 12; i++) { B.flash = 200; Cena.shake = 10; for (let k = 0; k < 10; k++) Cena.part.push({ x: B.x + Math.random() * 112, y: B.y + Math.random() * 120, vx: (Math.random() - 0.5) * 0.15, vy: -Math.random() * 0.12, vida: 1, cor: rnd([Arte.AURA[B.id], '#fff', '#ffd166']), tam: 2 }); await esperar(110); }
       Cena.tween(B, 'alpha', 0, 600); await Cena.tween(B, 'dy', 20, 600);
       Som.music('vitoria'); FX.banner('META BATIDA!'); Cena.atores.forEach(a => a.pose = 2);

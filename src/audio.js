@@ -507,6 +507,14 @@ const Som = (() => {
     bPendrive: t => { tone({ f: 600, type: 'triangle', t, dur: 0.12, v: 0.25 }); tone({ f: 900, type: 'triangle', t: t + 0.13, dur: 0.2, v: 0.25 }); say('HA HA HA HA HA!', 'obj:pendrive', 0.5); },
     bImpressora: t => { for (let i = 0; i < 6; i++) { tone({ f: 90, type: 'sawtooth', t: t + i * 0.22, dur: 0.15, v: 0.25, filter: { f: 400 } }); noise({ t: t + i * 0.22, dur: 0.12, v: 0.15, type: 'bandpass', f: 800, q: 5 }); } noise({ t: t + 1.4, dur: 0.4, v: 0.3, type: 'bandpass', f: 500, q: 8 }); say('CIANO VAZIO.', 'obj:impressora', 1.9); },
     bCEO: t => { bell(t, 1318, 1.5, 0.22); bell(t + 0.45, 1046, 1.8, 0.2); noise({ t: t + 0.9, dur: 1.2, v: 0.12, a: 0.3, type: 'lowpass', f: 300, to: 1200 }); [3.4, 3.65].forEach(d => { noise({ t: t + d, dur: 0.12, v: 0.4, type: 'bandpass', f: 600, q: 1, bus: 'voice' }); tone({ f: 150, type: 'sawtooth', t: t + d, dur: 0.08, v: 0.08, filter: { f: 600 }, bus: 'voice' }); }); },
+    // Enzo, o Filho do Dono: carro com som alto + notificação + skate freando
+    bFilho: t => {
+      for (let i = 0; i < 8; i++) { tone({ f: 55, to: 40, type: 'sine', t: t + i * 0.22, dur: 0.18, v: 0.6 }); if (i % 2) noise({ t: t + i * 0.22 + 0.11, dur: 0.06, v: 0.2, type: 'highpass', f: 5000 }); }
+      tone({ f: 110, to: 55, type: 'sawtooth', t, dur: 1.8, v: 0.12, vib: 0.06, vibRate: 3, filter: { f: 400 } });
+      noise({ t: t + 1.8, dur: 0.5, v: 0.3, type: 'bandpass', f: 1800, to: 600, q: 3 });
+      [1568, 2093].forEach((f, i) => tone({ f, type: 'sine', t: t + 2.3 + i * 0.09, dur: 0.18, v: 0.2 }));
+    },
+    filhoSai: t => { noise({ t, dur: 0.6, v: 0.25, type: 'bandpass', f: 600, to: 2400, q: 2 }); [784, 523].forEach((f, i) => tone({ f, type: 'triangle', t: t + 0.4 + i * 0.12, dur: 0.15, v: 0.15 })); },
     // Cena de VS (estilo jogo de luta)
     vsWhoosh: t => { noise({ t, dur: 0.45, v: 0.45, a: 0.15, type: 'bandpass', f: 400, to: 4000, q: 1.2 }); noise({ t: t + 0.3, dur: 0.4, v: 0.35, a: 0.1, type: 'bandpass', f: 3500, to: 500, q: 1.2 }); tone({ f: 80, to: 160, type: 'sawtooth', t, dur: 0.6, v: 0.12, filter: { f: 500 } }); },
     vsSlam: t => {
