@@ -368,11 +368,11 @@ const Som = (() => {
       { inst: 'crash', v: 0.15, seq: rep('.', 24) + ' x . . . . . . .' }] },
     derrota: { name: 'Vai Pro Feedback', bpm: 72, loop: false, parts: [
       { inst: 'trombone', v: 0.45, seq: 'G3 - - - F#3 - - - F3 - - - E3 - - - - - - - - - - - . . . . . . . .' }] },
-    fimVitoria: { name: 'Funcionário do Ano', bpm: 116, loop: true, parts: [
+    fimVitoria: { name: 'Funcionário do Ano', bpm: 116, loop: true, vezes: 2, parts: [
       { inst: 'brass', v: 0.35, seq: MENU_LEAD }, { inst: 'choir', v: 0.22, seq: MENU_CH }, { inst: 'bass', v: 0.5, seq: MENU_BASS },
       { inst: 'kick', v: 0.5, seq: 'x . . . x . . . x . . . x . . .' }, { inst: 'snare', v: 0.28, seq: '. . . . x . . . . . . . x . . .' },
       { inst: 'hat', v: 0.07, seq: 'x . x . x . x . x . x . x . x .' }, { inst: 'crash', v: 0.12, seq: 'x ' + rep('.', 63) }] },
-    fimDerrota: { name: 'Bilhete Azul', bpm: 56, loop: true, sour: true, parts: [
+    fimDerrota: { name: 'Bilhete Azul', bpm: 56, loop: true, vezes: 1, sour: true, parts: [
       { inst: 'organ', v: 0.35, seq: MENU_LEAD }, { inst: 'bass', v: 0.4, seq: MENU_BASS }] },
     pagode: { name: 'Pagode 8 bits', bpm: 98, loop: false, parts: [
       { inst: 'cavaco', v: 0.25, seq: [pagBar('E4+G4+C5'), pagBar('E4+G4+C#5'), pagBar('F4+A4+D5'), pagBar('F4+B4+D5')].join(' ') },
@@ -395,7 +395,7 @@ const Som = (() => {
     stopMusic();
     const s = SONGS[name]; if (!s) return;
     if (!s._p) { s._p = s.parts.map(p => ({ ...p, seq: parse(p.seq) })); s._len = Math.max(...s._p.map(p => p.seq.length)); }
-    M.cur = s; M.name = name; M.step = 0; M.next = ctx.currentTime + 0.06;
+    M.cur = s; M.name = name; M.step = 0; M.voltas = 0; M.next = ctx.currentTime + 0.06;
     M.timer = setInterval(sched, 25); sched();
     onMusic && onMusic(name);
   }
@@ -409,7 +409,7 @@ const Som = (() => {
         const ev = p.seq[M.step % p.seq.length]; if (ev) playEv(s, p, ev, M.next, sd);
       }
       M.next += sd; M.step++;
-      if (M.step >= s._len) { if (s.loop) M.step = 0; else { stopMusic(); break; } }
+      if (M.step >= s._len) { M.voltas++; if (s.loop && !(s.vezes && M.voltas >= s.vezes)) M.step = 0; else { stopMusic(); break; } }
     }
   }
   function playEv(s, p, ev, t, sd) {

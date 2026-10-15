@@ -171,14 +171,21 @@ const UI = {
     const el = this.html(`<div id="barra"><span>📅 <b>${Regras.MESES[st.mes]}</b> ${st.mes + 1}/12</span><span>Caixa <b class="${st.caixa < 0 ? 'dinheiro-neg' : ''}">${R$(st.caixa)}</b></span><span>Folha <b>${R$(Regras.folha(st))}</b>/mês</span><span>Treino <b>${st.pt} PT</b></span><span>Derrotas <b>${st.derrotas}/${Regras.CFG.maxDerrotas}</b></span><span class="esp"></span><span>vs <b>${esc(b.nome)}</b></span></div>`);
     return el;
   },
-  engrenagem() {
-    const b = this.html(`<button class="btn peq azul engr" title="Som e opções">♪ SOM</button>`);
-    clique(b, () => Opcoes.abrir());
-  },
+  engrenagem() { Opcoes.sincronizar(); },  // os botões de som ficam fixos no palco, em todas as telas
 };
 
 /* ---------- opções de áudio ---------- */
 const Opcoes = {
+  criarBotoes() {
+    const box = document.createElement('div'); box.className = 'engr row'; box.style.gap = '6px';
+    box.innerHTML = `<button class="btn peq azul" id="btnSom" title="Volume de música, efeitos e falas">♪ SOM</button><button class="btn peq" id="btnMudo" title="Liga/desliga todo o som (tecla M)">🔊</button>`;
+    document.getElementById('stage').appendChild(box);
+    clique($('#btnSom'), () => Opcoes.abrir());
+    $('#btnMudo').addEventListener('click', () => Opcoes.alternarMudo());
+    window.addEventListener('keydown', e => { if ((e.key === 'm' || e.key === 'M') && !e.ctrlKey && !e.metaKey) Opcoes.alternarMudo(); });
+  },
+  alternarMudo() { Som.init(); Som.setMuted(!Som.isMuted()); Prefs.save({ ...Som.getVol(), muted: Som.isMuted() }); this.sincronizar(); },
+  sincronizar() { const b = $('#btnMudo'); if (b) { b.textContent = Som.isMuted() ? '🔇' : '🔊'; b.classList.toggle('verm', Som.isMuted()); } },
   aplicar() { const p = Prefs.load(); ['music', 'sfx', 'voice'].forEach(k => { if (typeof p[k] === 'number') Som.setVol(k, p[k]); }); Som.setMuted(!!p.muted); },
   abrir() {
     const p = { ...Som.getVol(), muted: Som.isMuted() };
@@ -191,7 +198,7 @@ const Opcoes = {
     const salvar = () => Prefs.save({ ...Som.getVol(), muted: Som.isMuted() });
     m.querySelectorAll('input[type=range]').forEach(r => r.oninput = () => { Som.setVol(r.dataset.k, +r.value); salvar(); if (r.dataset.k === 'sfx') Som.sfx('grampo'); if (r.dataset.k === 'voice') Som.say('oi, tudo bem?', 'char'); });
     clique($('#mudo', m), e => { Som.setMuted(!Som.isMuted()); e.target.textContent = 'Mudo: ' + (Som.isMuted() ? 'sim' : 'não'); e.target.classList.toggle('verm', Som.isMuted()); salvar(); });
-    clique($('#fechar', m), () => m.remove());
+    clique($('#fechar', m), () => { m.remove(); Opcoes.sincronizar(); });
   },
 };
 
@@ -667,8 +674,8 @@ window.addEventListener('resize', ajustarEscala);
 window.addEventListener('DOMContentLoaded', () => {
   UI.ui = $('#ui'); FX.el = $('#fx');
   const tela = $('#tela'); Cena.ctx = tela.getContext('2d'); Cena.ctx.imageSmoothingEnabled = false;
-  ajustarEscala(); loopCena();
+  ajustarEscala(); loopCena(); Opcoes.criarBotoes();
   Cena.setar('fachada');
   const splash = UI.html(`<div class="modal" style="cursor:pointer"><div class="painel" style="position:relative;text-align:center;width:460px"><div class="tit" style="font-size:32px">BOA FOLHA</div><div class="sub" style="font-size:14px;margin:6px 0 14px">Um Ano no RH</div><button class="btn grande verde">Clique para bater o ponto</button><div class="sub" style="margin-top:10px">Jogo com som. Use fones ou ajuste o volume em ♪ SOM.</div></div></div>`);
-  splash.addEventListener('click', () => { Som.init(); Opcoes.aplicar(); Som.sfx('grampo'); splash.remove(); Menu.abrir(); }, { once: true });
+  splash.addEventListener('click', () => { Som.init(); Opcoes.aplicar(); Opcoes.sincronizar(); Som.sfx('grampo'); splash.remove(); Menu.abrir(); }, { once: true });
 });

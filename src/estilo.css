@@ -25,7 +25,7 @@ canvas.px{image-rendering:pixelated;image-rendering:crisp-edges;display:block}
 .badge{display:inline-block;font-size:11px;font-weight:bold;padding:1px 5px;border:2px solid var(--tinta);color:#fff;text-shadow:1px 1px 0 var(--tinta);margin-right:3px}
 .row{display:flex;gap:8px;align-items:center}
 /* barra superior */
-#barra{position:absolute;left:0;right:0;top:0;height:42px;background:var(--roxo);border-bottom:4px solid var(--ouro);display:flex;align-items:center;gap:16px;padding:0 96px 0 12px;color:#fff;font-size:13px;white-space:nowrap;z-index:5}
+#barra{position:absolute;left:0;right:0;top:0;height:42px;background:var(--roxo);border-bottom:4px solid var(--ouro);display:flex;align-items:center;gap:16px;padding:0 150px 0 12px;color:#fff;font-size:13px;white-space:nowrap;z-index:5}
 #barra b{color:var(--ouro)}
 #barra .esp{flex:1}
 .engr{position:absolute;right:10px;top:7px;z-index:40}

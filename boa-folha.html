@@ -32,7 +32,7 @@ canvas.px{image-rendering:pixelated;image-rendering:crisp-edges;display:block}
 .badge{display:inline-block;font-size:11px;font-weight:bold;padding:1px 5px;border:2px solid var(--tinta);color:#fff;text-shadow:1px 1px 0 var(--tinta);margin-right:3px}
 .row{display:flex;gap:8px;align-items:center}
 /* barra superior */
-#barra{position:absolute;left:0;right:0;top:0;height:42px;background:var(--roxo);border-bottom:4px solid var(--ouro);display:flex;align-items:center;gap:16px;padding:0 96px 0 12px;color:#fff;font-size:13px;white-space:nowrap;z-index:5}
+#barra{position:absolute;left:0;right:0;top:0;height:42px;background:var(--roxo);border-bottom:4px solid var(--ouro);display:flex;align-items:center;gap:16px;padding:0 150px 0 12px;color:#fff;font-size:13px;white-space:nowrap;z-index:5}
 #barra b{color:var(--ouro)}
 #barra .esp{flex:1}
 .engr{position:absolute;right:10px;top:7px;z-index:40}
@@ -493,11 +493,11 @@ const Som = (() => {
       { inst: 'crash', v: 0.15, seq: rep('.', 24) + ' x . . . . . . .' }] },
     derrota: { name: 'Vai Pro Feedback', bpm: 72, loop: false, parts: [
       { inst: 'trombone', v: 0.45, seq: 'G3 - - - F#3 - - - F3 - - - E3 - - - - - - - - - - - . . . . . . . .' }] },
-    fimVitoria: { name: 'Funcionário do Ano', bpm: 116, loop: true, parts: [
+    fimVitoria: { name: 'Funcionário do Ano', bpm: 116, loop: true, vezes: 2, parts: [
       { inst: 'brass', v: 0.35, seq: MENU_LEAD }, { inst: 'choir', v: 0.22, seq: MENU_CH }, { inst: 'bass', v: 0.5, seq: MENU_BASS },
       { inst: 'kick', v: 0.5, seq: 'x . . . x . . . x . . . x . . .' }, { inst: 'snare', v: 0.28, seq: '. . . . x . . . . . . . x . . .' },
       { inst: 'hat', v: 0.07, seq: 'x . x . x . x . x . x . x . x .' }, { inst: 'crash', v: 0.12, seq: 'x ' + rep('.', 63) }] },
-    fimDerrota: { name: 'Bilhete Azul', bpm: 56, loop: true, sour: true, parts: [
+    fimDerrota: { name: 'Bilhete Azul', bpm: 56, loop: true, vezes: 1, sour: true, parts: [
       { inst: 'organ', v: 0.35, seq: MENU_LEAD }, { inst: 'bass', v: 0.4, seq: MENU_BASS }] },
     pagode: { name: 'Pagode 8 bits', bpm: 98, loop: false, parts: [
       { inst: 'cavaco', v: 0.25, seq: [pagBar('E4+G4+C5'), pagBar('E4+G4+C#5'), pagBar('F4+A4+D5'), pagBar('F4+B4+D5')].join(' ') },
@@ -520,7 +520,7 @@ const Som = (() => {
     stopMusic();
     const s = SONGS[name]; if (!s) return;
     if (!s._p) { s._p = s.parts.map(p => ({ ...p, seq: parse(p.seq) })); s._len = Math.max(...s._p.map(p => p.seq.length)); }
-    M.cur = s; M.name = name; M.step = 0; M.next = ctx.currentTime + 0.06;
+    M.cur = s; M.name = name; M.step = 0; M.voltas = 0; M.next = ctx.currentTime + 0.06;
     M.timer = setInterval(sched, 25); sched();
     onMusic && onMusic(name);
   }
@@ -534,7 +534,7 @@ const Som = (() => {
         const ev = p.seq[M.step % p.seq.length]; if (ev) playEv(s, p, ev, M.next, sd);
       }
       M.next += sd; M.step++;
-      if (M.step >= s._len) { if (s.loop) M.step = 0; else { stopMusic(); break; } }
+      if (M.step >= s._len) { M.voltas++; if (s.loop && !(s.vezes && M.voltas >= s.vezes)) M.step = 0; else { stopMusic(); break; } }
     }
   }
   function playEv(s, p, ev, t, sd) {
@@ -1872,14 +1872,21 @@ const UI = {
     const el = this.html(`<div id="barra"><span>📅 <b>${Regras.MESES[st.mes]}</b> ${st.mes + 1}/12</span><span>Caixa <b class="${st.caixa < 0 ? 'dinheiro-neg' : ''}">${R$(st.caixa)}</b></span><span>Folha <b>${R$(Regras.folha(st))}</b>/mês</span><span>Treino <b>${st.pt} PT</b></span><span>Derrotas <b>${st.derrotas}/${Regras.CFG.maxDerrotas}</b></span><span class="esp"></span><span>vs <b>${esc(b.nome)}</b></span></div>`);
     return el;
   },
-  engrenagem() {
-    const b = this.html(`<button class="btn peq azul engr" title="Som e opções">♪ SOM</button>`);
-    clique(b, () => Opcoes.abrir());
-  },
+  engrenagem() { Opcoes.sincronizar(); },  // os botões de som ficam fixos no palco, em todas as telas
 };
 
 /* ---------- opções de áudio ---------- */
 const Opcoes = {
+  criarBotoes() {
+    const box = document.createElement('div'); box.className = 'engr row'; box.style.gap = '6px';
+    box.innerHTML = `<button class="btn peq azul" id="btnSom" title="Volume de música, efeitos e falas">♪ SOM</button><button class="btn peq" id="btnMudo" title="Liga/desliga todo o som (tecla M)">🔊</button>`;
+    document.getElementById('stage').appendChild(box);
+    clique($('#btnSom'), () => Opcoes.abrir());
+    $('#btnMudo').addEventListener('click', () => Opcoes.alternarMudo());
+    window.addEventListener('keydown', e => { if ((e.key === 'm' || e.key === 'M') && !e.ctrlKey && !e.metaKey) Opcoes.alternarMudo(); });
+  },
+  alternarMudo() { Som.init(); Som.setMuted(!Som.isMuted()); Prefs.save({ ...Som.getVol(), muted: Som.isMuted() }); this.sincronizar(); },
+  sincronizar() { const b = $('#btnMudo'); if (b) { b.textContent = Som.isMuted() ? '🔇' : '🔊'; b.classList.toggle('verm', Som.isMuted()); } },
   aplicar() { const p = Prefs.load(); ['music', 'sfx', 'voice'].forEach(k => { if (typeof p[k] === 'number') Som.setVol(k, p[k]); }); Som.setMuted(!!p.muted); },
   abrir() {
     const p = { ...Som.getVol(), muted: Som.isMuted() };
@@ -1892,7 +1899,7 @@ const Opcoes = {
     const salvar = () => Prefs.save({ ...Som.getVol(), muted: Som.isMuted() });
     m.querySelectorAll('input[type=range]').forEach(r => r.oninput = () => { Som.setVol(r.dataset.k, +r.value); salvar(); if (r.dataset.k === 'sfx') Som.sfx('grampo'); if (r.dataset.k === 'voice') Som.say('oi, tudo bem?', 'char'); });
     clique($('#mudo', m), e => { Som.setMuted(!Som.isMuted()); e.target.textContent = 'Mudo: ' + (Som.isMuted() ? 'sim' : 'não'); e.target.classList.toggle('verm', Som.isMuted()); salvar(); });
-    clique($('#fechar', m), () => m.remove());
+    clique($('#fechar', m), () => { m.remove(); Opcoes.sincronizar(); });
   },
 };
 
@@ -2368,10 +2375,10 @@ window.addEventListener('resize', ajustarEscala);
 window.addEventListener('DOMContentLoaded', () => {
   UI.ui = $('#ui'); FX.el = $('#fx');
   const tela = $('#tela'); Cena.ctx = tela.getContext('2d'); Cena.ctx.imageSmoothingEnabled = false;
-  ajustarEscala(); loopCena();
+  ajustarEscala(); loopCena(); Opcoes.criarBotoes();
   Cena.setar('fachada');
   const splash = UI.html(`<div class="modal" style="cursor:pointer"><div class="painel" style="position:relative;text-align:center;width:460px"><div class="tit" style="font-size:32px">BOA FOLHA</div><div class="sub" style="font-size:14px;margin:6px 0 14px">Um Ano no RH</div><button class="btn grande verde">Clique para bater o ponto</button><div class="sub" style="margin-top:10px">Jogo com som. Use fones ou ajuste o volume em ♪ SOM.</div></div></div>`);
-  splash.addEventListener('click', () => { Som.init(); Opcoes.aplicar(); Som.sfx('grampo'); splash.remove(); Menu.abrir(); }, { once: true });
+  splash.addEventListener('click', () => { Som.init(); Opcoes.aplicar(); Opcoes.sincronizar(); Som.sfx('grampo'); splash.remove(); Menu.abrir(); }, { once: true });
 });
 
 </script>
