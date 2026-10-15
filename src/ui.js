@@ -37,7 +37,8 @@ const Cena = {
     const sx = this.shake ? (Math.random() - 0.5) * this.shake : 0, sy = this.shake ? (Math.random() - 0.5) * this.shake : 0;
     this.shake = Math.max(0, this.shake - dt * 0.04);
     g.save(); g.translate(Math.round(sx), Math.round(sy));
-    g.drawImage(Arte.cenaCanvas(this.nome), 0, 0);
+    if (this.nome === 'menu16') Cenas16.menu(g, Math.floor(this.t / (1000 / 12)));
+    else g.drawImage(Arte.cenaCanvas(this.nome), 0, 0);
     const b = this.boss;
     if (b) {
       const cor = Arte.AURA[b.id];
@@ -104,7 +105,7 @@ const FX = {
     setTimeout(() => d.remove(), ms); return d;
   },
   banner(txt, sub = '') { const d = document.createElement('div'); d.className = 'banner'; d.innerHTML = esc(txt) + (sub ? '<small>' + esc(sub) + '</small>' : ''); this.el.appendChild(d); setTimeout(() => d.remove(), 1050); },
-  flash(cor = '#fff', forca = 0.8) { const f = $('#flash'); f.style.background = cor; f.style.transition = 'none'; f.style.opacity = forca; requestAnimationFrame(() => { f.style.transition = 'opacity .35s'; f.style.opacity = 0; }); },
+  flash(cor = '#fff', forca = 0.8) { const f = $('#flash'); f.style.background = cor; f.style.transition = 'none'; f.style.opacity = forca; void f.offsetWidth; setTimeout(() => { f.style.transition = 'opacity .35s'; f.style.opacity = 0; }, 30); },
   limpar() { this.el.innerHTML = ''; },
 };
 
@@ -209,7 +210,7 @@ const Opcoes = {
 /* ---------- MENU ---------- */
 const Menu = {
   abrir() {
-    UI.limpar(); Cena.setar('fachada'); Som.ambient(false); Som.music('menu');
+    UI.limpar(); Cena.setar('menu16'); Som.ambient(false); Som.music('menu');
     const save = Estado.carregar();
     const p = UI.html(`<div class="painel" style="left:330px;top:290px;width:300px;display:flex;flex-direction:column;gap:9px;padding:14px"><div class="tit" style="text-align:center;font-size:18px">Um Ano no RH</div></div>`);
     const add = (t, cls, fn) => { const b = document.createElement('button'); b.className = 'btn ' + cls; b.textContent = t; p.appendChild(clique(b, fn)); };
@@ -682,12 +683,14 @@ const Combate = {
       this.falaChefe(perde, 2000); Som.say(perde, ehFilho ? 'boss' : b.tipo, 0, ehFilho ? { pitch: 1.5 } : {}); await esperar(1600);
       B.morto = true; for (let i = 0; i < 12; i++) { B.flash = 200; Cena.shake = 10; for (let k = 0; k < 10; k++) Cena.part.push({ x: B.x + Math.random() * 112, y: B.y + Math.random() * 120, vx: (Math.random() - 0.5) * 0.15, vy: -Math.random() * 0.12, vida: 1, cor: rnd([Arte.AURA[B.id], '#fff', '#ffd166']), tam: 2 }); await esperar(110); }
       Cena.tween(B, 'alpha', 0, 600); await Cena.tween(B, 'dy', 20, 600);
-      Som.music('vitoria'); FX.banner('META BATIDA!'); Cena.atores.forEach(a => a.pose = 2);
+      Som.music('vitoria'); Cena.atores.forEach(a => a.pose = 2);
+      await Cenas16.tocar('vitoria', { time: cb.time.map(u => u.id) });
     } else {
       this.falaChefe(b.vence, 2200); Som.say(b.vence, b.tipo); await esperar(2000);
-      Som.music('derrota'); FX.banner('VAI PRO FEEDBACK...'); Cena.atores.forEach(a => a.out = true);
+      Cena.atores.forEach(a => a.out = true);
+      setTimeout(() => Som.music('derrota'), 2000 * VEL);
+      await Cenas16.tocar('derrota', { time: cb.time.map(u => u.id) });
     }
-    await esperar(2600);
     this.rel = Regras.fimMes(st, cb);
     Entrevista.abrir(vit, cb);
   },
@@ -763,5 +766,5 @@ window.addEventListener('DOMContentLoaded', () => {
   ajustarEscala(); loopCena(); Opcoes.criarBotoes();
   Cena.setar('fachada');
   const splash = UI.html(`<div class="modal" style="cursor:pointer"><div class="painel" style="position:relative;text-align:center;width:460px"><div class="tit" style="font-size:32px">BOA FOLHA</div><div class="sub" style="font-size:14px;margin:6px 0 14px">Um Ano no RH</div><button class="btn grande verde">Clique para bater o ponto</button><div class="sub" style="margin-top:10px">Jogo com som. Use fones ou ajuste o volume em ♪ SOM.</div></div></div>`);
-  splash.addEventListener('click', () => { Som.init(); Opcoes.aplicar(); Opcoes.sincronizar(); Som.sfx('grampo'); splash.remove(); Menu.abrir(); }, { once: true });
+  splash.addEventListener('click', async () => { Som.init(); Opcoes.aplicar(); Opcoes.sincronizar(); Som.sfx('grampo'); splash.remove(); await Cenas16.tocar('abertura'); Menu.abrir(); }, { once: true });
 });

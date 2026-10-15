@@ -792,5 +792,6 @@ const Arte = (() => {
   function desenharCasa(g, tipo, id, t) { g.imageSmoothingEnabled = false; (CASA[tipo] || CASA.atestado)(g, t, id); }
 
   return { desenharCasa, retrato, retratoCanvas, corpoCanvas, bossCanvas, bossBranco, cenaCanvas, flipCanvas, cinza, texto, larguraTexto, shade, painter,
-    ARENA_DO_CHEFE, AURA, CORES_AREA, LOOKS, toCanvas, Bf };
+    ARENA_DO_CHEFE, AURA, CORES_AREA, LOOKS, toCanvas, Bf,
+    st, rect, ell, cyl, box, poly, line, px, outl, outer, clr, PELES, RP, BY };
 })();

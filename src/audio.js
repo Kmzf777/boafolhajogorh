@@ -515,6 +515,18 @@ const Som = (() => {
       [1568, 2093].forEach((f, i) => tone({ f, type: 'sine', t: t + 2.3 + i * 0.09, dur: 0.18, v: 0.2 }));
     },
     filhoSai: t => { noise({ t, dur: 0.6, v: 0.25, type: 'bandpass', f: 600, to: 2400, q: 2 }); [784, 523].forEach((f, i) => tone({ f, type: 'triangle', t: t + 0.4 + i * 0.12, dur: 0.15, v: 0.15 })); },
+    // Cutscenes (abertura, vitória no bar, derrota na diretoria)
+    vento: t => { noise({ t, dur: 3.2, v: 0.22, a: 1.2, type: 'bandpass', f: 500, to: 1400, q: 1.5 }); noise({ t: t + 1, dur: 2.4, v: 0.12, a: 0.8, type: 'bandpass', f: 1800, to: 700, q: 2 }); },
+    arpejoAbertura: t => { ['C5', 'E5', 'G5', 'C6', 'E6', 'G6'].forEach((n, i) => { tone({ f: nf(n), type: 'pulse25', t: t + i * 0.09, dur: 0.5, v: 0.12, filter: { f: 5000 } }); tone({ f: nf(n), type: 'triangle', t: t + i * 0.09, dur: 0.7, v: 0.12 }); }); bell(t + 0.6, nf('C7'), 1.4, 0.1); },
+    neon: t => { for (let i = 0; i < 5; i++) { tone({ f: 120, type: 'square', t: t + i * 0.07 + (i > 2 ? 0.15 : 0), dur: 0.04, v: 0.09, filter: { f: 1500 } }); noise({ t: t + i * 0.07, dur: 0.03, v: 0.06, type: 'highpass', f: 4000 }); } },
+    buzinaCaminhao: t => { [0, 0.32].forEach(d => { tone({ f: 310, type: 'square', t: t + d, dur: 0.22, v: 0.12, filter: { f: 1400 } }); tone({ f: 392, type: 'square', t: t + d, dur: 0.22, v: 0.1, filter: { f: 1400 } }); }); },
+    brinde: t => { bell(t, 2637, 0.5, 0.16); bell(t + 0.025, 3136, 0.5, 0.12); noise({ t, dur: 0.03, v: 0.15, type: 'highpass', f: 6000 }); },
+    risadas: t => { [1.3, 1.6, 1.1].forEach((p, i) => babble('ha ha ha ha', { t: t + i * 0.25, pitch: p, rate: 1.5, v: 0.22 })); murmur(t, 2.5, 0.07); },
+    notas: t => { for (let i = 0; i < 10; i++) noise({ t: t + i * 0.05 + Math.random() * 0.03, dur: 0.03, v: 0.12, type: 'bandpass', f: 2500 + Math.random() * 2000, q: 2 }); },
+    carimboTela: t => { noise({ t, dur: 0.12, v: 0.25, type: 'bandpass', f: 300, to: 1200, q: 1 }); thump(t + 0.1, 45, 1, 0.5); thump(t + 0.1, 40, 0.7, 0.6, echoIn); noise({ t: t + 0.1, dur: 0.25, v: 0.6, type: 'lowpass', f: 900 }); bell(t + 0.3, 1568, 1, 0.12); },
+    portaRange: t => { tone({ f: 200, to: 340, type: 'sawtooth', t, dur: 1.2, v: 0.09, a: 0.15, vib: 0.06, vibRate: 14, filter: { type: 'bandpass', f: 800, q: 4 } }); tone({ f: 260, to: 210, type: 'sawtooth', t: t + 0.9, dur: 0.6, v: 0.06, vib: 0.08, vibRate: 18, filter: { type: 'bandpass', f: 900, q: 4 } }); },
+    dedo: t => { thump(t, 90, 0.35, 0.08); tone({ f: 98, type: 'sawtooth', t, dur: 0.9, v: 0.14, a: 0.01, filter: { f: 600, to: 200 } }); tone({ f: 92.5, type: 'sawtooth', t, dur: 0.9, v: 0.12, a: 0.01, filter: { f: 600, to: 200 } }); },
+    passo: t => { noise({ t, dur: 0.05, v: 0.18, type: 'lowpass', f: 700 }); tone({ f: 80, type: 'sine', t, dur: 0.05, v: 0.12 }); },
     // Cena de VS (estilo jogo de luta)
     vsWhoosh: t => { noise({ t, dur: 0.45, v: 0.45, a: 0.15, type: 'bandpass', f: 400, to: 4000, q: 1.2 }); noise({ t: t + 0.3, dur: 0.4, v: 0.35, a: 0.1, type: 'bandpass', f: 3500, to: 500, q: 1.2 }); tone({ f: 80, to: 160, type: 'sawtooth', t, dur: 0.6, v: 0.12, filter: { f: 500 } }); },
     vsSlam: t => {
