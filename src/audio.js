@@ -507,6 +507,32 @@ const Som = (() => {
     bPendrive: t => { tone({ f: 600, type: 'triangle', t, dur: 0.12, v: 0.25 }); tone({ f: 900, type: 'triangle', t: t + 0.13, dur: 0.2, v: 0.25 }); say('HA HA HA HA HA!', 'obj:pendrive', 0.5); },
     bImpressora: t => { for (let i = 0; i < 6; i++) { tone({ f: 90, type: 'sawtooth', t: t + i * 0.22, dur: 0.15, v: 0.25, filter: { f: 400 } }); noise({ t: t + i * 0.22, dur: 0.12, v: 0.15, type: 'bandpass', f: 800, q: 5 }); } noise({ t: t + 1.4, dur: 0.4, v: 0.3, type: 'bandpass', f: 500, q: 8 }); say('CIANO VAZIO.', 'obj:impressora', 1.9); },
     bCEO: t => { bell(t, 1318, 1.5, 0.22); bell(t + 0.45, 1046, 1.8, 0.2); noise({ t: t + 0.9, dur: 1.2, v: 0.12, a: 0.3, type: 'lowpass', f: 300, to: 1200 }); [3.4, 3.65].forEach(d => { noise({ t: t + d, dur: 0.12, v: 0.4, type: 'bandpass', f: 600, q: 1, bus: 'voice' }); tone({ f: 150, type: 'sawtooth', t: t + d, dur: 0.08, v: 0.08, filter: { f: 600 }, bus: 'voice' }); }); },
+    // Cena de VS (estilo jogo de luta)
+    vsWhoosh: t => { noise({ t, dur: 0.45, v: 0.45, a: 0.15, type: 'bandpass', f: 400, to: 4000, q: 1.2 }); noise({ t: t + 0.3, dur: 0.4, v: 0.35, a: 0.1, type: 'bandpass', f: 3500, to: 500, q: 1.2 }); tone({ f: 80, to: 160, type: 'sawtooth', t, dur: 0.6, v: 0.12, filter: { f: 500 } }); },
+    vsSlam: t => {
+      thump(t, 55, 1, 0.6); thump(t, 45, 0.7, 0.6, echoIn);
+      noise({ t, dur: 1.4, v: 0.4, type: 'highpass', f: 2500 }); noise({ t, dur: 0.5, v: 0.6, type: 'lowpass', f: 700 });
+      ['E2', 'B2', 'E3', 'G3'].forEach(n => tone({ f: nf(n), type: 'sawtooth', t, dur: 1.2, v: 0.12, a: 0.005, filter: { f: 1800, to: 300 } }));
+    },
+    // Locutor sintetizado: "FAIT!" (fricativa F + ditongo A→I + estalo T), grave, distorcido e com eco
+    fight: t => {
+      const dest = shaper(3, lp(4200, out()));
+      const wet = ctx.createGain(); wet.gain.value = 0.6; wet.connect(echoIn);
+      noise({ t, dur: 0.13, v: 0.55, a: 0.02, type: 'highpass', f: 2200, dest });
+      const t1 = t + 0.1, d = 0.55;
+      const b1 = bq('bandpass', 750, 6), b2 = bq('bandpass', 1150, 9), b3 = bq('bandpass', 2500, 10);
+      b1.frequency.setValueAtTime(760, t1); b1.frequency.linearRampToValueAtTime(330, t1 + d);
+      b2.frequency.setValueAtTime(1180, t1); b2.frequency.linearRampToValueAtTime(2150, t1 + d);
+      const g = ctx.createGain(); g.gain.setValueAtTime(0, t1); g.gain.linearRampToValueAtTime(3.2, t1 + 0.03); g.gain.setValueAtTime(3.2, t1 + d * 0.7); g.gain.linearRampToValueAtTime(0, t1 + d);
+      b1.connect(g); b2.connect(g); b3.connect(g); g.connect(dest); g.connect(wet);
+      [0, 7, -7].forEach(dt => {
+        const o = ctx.createOscillator(); o.type = 'sawtooth'; o.detune.value = dt;
+        o.frequency.setValueAtTime(128, t1); o.frequency.linearRampToValueAtTime(150, t1 + 0.12); o.frequency.exponentialRampToValueAtTime(92, t1 + d);
+        o.connect(b1); o.connect(b2); o.connect(b3); o.start(t1); o.stop(t1 + d + 0.05);
+      });
+      noise({ t: t1 + d + 0.03, dur: 0.05, v: 0.6, type: 'highpass', f: 3000, dest });
+      thump(t + 0.05, 60, 0.6, 0.4);
+    },
   };
   function sfx(id) { if (!init() || !S[id]) return; try { S[id](now() + 0.03); } catch (e) { console.warn('sfx', id, e); } }
 

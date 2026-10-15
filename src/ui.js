@@ -448,6 +448,44 @@ const Escalacao = {
   },
 };
 
+/* ---------- CENA DE VS (antes de cada batalha, estilo jogo de luta) ---------- */
+const VS = {
+  mostrar(st, cb, b) {
+    return new Promise(res => {
+      const el = document.createElement('div'); el.className = 'vs';
+      el.innerHTML = `<div class="lado esq"></div><div class="lado dir"></div><div class="corte"></div>
+        <div class="vtit e">TIME BOA FOLHA</div><div class="vtit d">CHEFE DO MÊS · ${Regras.MESES[st.mes].toUpperCase()}</div>
+        <div class="time"></div>
+        <div class="chefe"><div class="aura" style="background:radial-gradient(ellipse,${Arte.AURA[b.id]},transparent 70%)"></div></div>
+        <div class="placa">${esc(b.nome.toUpperCase())}<small>${esc(b.titulo)}</small></div>
+        <div class="vstxt">VS</div><div class="faixa"></div><div class="fight">FIGHT!</div><div class="pular">clique para pular</div>`;
+      cb.time.forEach((u, i) => {
+        const c = Regras.CHAR[u.id], card = document.createElement('div'); card.className = 'vcard';
+        card.style.animationDelay = (0.3 + i * 0.12) + 's'; card.style.position = 'relative';
+        card.appendChild(retratoEl(u.id, 'bravo', 4));
+        card.insertAdjacentHTML('beforeend', `<div class="nm">${esc(c.nome.toUpperCase())}</div><span class="ar">${badgeArea(c.area)}</span>`);
+        $('.time', el).appendChild(card);
+      });
+      const bc = bossEl(b.id, 3); bc.style.position = 'relative'; bc.style.filter = `drop-shadow(0 0 10px ${Arte.AURA[b.id]}) drop-shadow(6px 6px 0 rgba(0,0,0,.6))`;
+      $('.chefe', el).appendChild(bc);
+      document.getElementById('stage').appendChild(el);
+      const timers = [], em = (ms, fn) => timers.push(setTimeout(fn, ms * VEL));
+      let acabou = false;
+      const fim = () => {
+        if (acabou) return; acabou = true; timers.forEach(clearTimeout);
+        el.classList.add('sai'); setTimeout(() => { el.remove(); res(); }, 350 * VEL);
+      };
+      Som.sfx('vsWhoosh');
+      em(450, () => Som.sfx('vsWhoosh'));
+      em(1150, () => { Som.sfx('vsSlam'); el.classList.add('treme'); FX.flash('#fff', 0.7); });
+      em(1600, () => el.classList.remove('treme'));
+      em(2380, () => { Som.sfx('fight'); FX.flash('#ffd166', 0.5); el.classList.add('treme'); });
+      em(3700, fim);
+      el.addEventListener('click', () => { Som.sfx('grampo'); fim(); });
+    });
+  },
+};
+
 /* ---------- COMBATE (apresentação; regras em Regras.semana) ---------- */
 const SLOTS = [[22, 118], [58, 128], [94, 118], [130, 128]];
 const Combate = {
@@ -457,7 +495,9 @@ const Combate = {
     const st = Estado.st, b = Regras.boss(st);
     this.cb = Regras.iniciarCombate(st); this.ordens = {}; this.ocupado = true;
     st.fase = 'hub'; Estado.salvar();
-    UI.limpar(); Cena.setar(Arte.ARENA_DO_CHEFE[b.id]); Som.ambient(false);
+    Som.stopMusic(); Som.ambient(false);
+    await VS.mostrar(st, this.cb, b);
+    UI.limpar(); Cena.setar(Arte.ARENA_DO_CHEFE[b.id]);
     Som.music(b.id === 'ceo' ? 'final' : b.tipo.startsWith('obj') ? 'chefe' : 'combate'); Som.setWeek(1);
     this.cb.time.forEach((u, i) => { const [x, y] = SLOTS[i]; Cena.ator(u.id, x, y, { baseX: x, baseY: y }); });
     Cena.boss = { id: b.id, x: 200, y: 12, alpha: 0, flash: 0, dx: 40, dy: 0, tremor: 0 };

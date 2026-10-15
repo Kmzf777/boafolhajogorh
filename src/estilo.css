@@ -99,3 +99,44 @@ canvas.px{image-rendering:pixelated;image-rendering:crisp-edges;display:block}
 .num-ord{display:inline-flex;width:24px;height:24px;align-items:center;justify-content:center;background:var(--tinta);color:var(--ouro);font-weight:bold}
 ::-webkit-scrollbar{width:8px}::-webkit-scrollbar-thumb{background:var(--roxo)}
 .alt:disabled{color:var(--tinta);cursor:default}
+/* cena de VS (estilo jogo de luta) */
+.vs{position:absolute;inset:0;z-index:45;overflow:hidden;background:#07040f;cursor:pointer}
+.vs.treme{animation:vsTreme .45s linear}
+.vs.sai{animation:vsSai .35s ease-in forwards}
+.vs .lado{position:absolute;top:0;bottom:0;width:60%;overflow:hidden}
+.vs .esq{left:0;clip-path:polygon(0 0,100% 0,80% 100%,0 100%);background:linear-gradient(160deg,#0e1f5a,#1a4a9a 45%,#2a78c0);animation:vsEntraE .35s cubic-bezier(.2,.9,.3,1.2) both}
+.vs .dir{right:0;clip-path:polygon(20% 0,100% 0,100% 100%,0 100%);background:linear-gradient(200deg,#4a0610,#a01020 45%,#e63946);animation:vsEntraD .35s cubic-bezier(.2,.9,.3,1.2) both}
+.vs .lado:before{content:'';position:absolute;inset:-40px;background:repeating-linear-gradient(98deg,transparent 0 26px,rgba(255,255,255,.10) 26px 30px,transparent 30px 60px,rgba(255,255,255,.05) 60px 62px);animation:vsLinhas .35s linear infinite}
+.vs .dir:before{animation-direction:reverse}
+.vs .lado:after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 55%,rgba(255,255,255,.18),transparent 60%)}
+.vs .corte{position:absolute;left:50%;top:-20px;width:10px;height:600px;background:#fff;transform:translateX(-50%) rotate(11deg);box-shadow:0 0 18px #fff,0 0 40px #ffd166;animation:vsCorte .5s .25s both}
+.vs .vtit{position:absolute;top:14px;font-size:15px;font-weight:bold;letter-spacing:3px;color:#fff;text-shadow:2px 2px 0 #000;animation:vsSobe .3s .35s both}
+.vs .vtit.e{left:24px}.vs .vtit.d{right:24px}
+.vs .time{position:absolute;left:28px;top:52px;display:grid;grid-template-columns:repeat(2,148px);gap:14px 18px}
+.vs .vcard{background:#fff;border:4px solid #1a1a2e;box-shadow:6px 6px 0 rgba(0,0,0,.55);transform:skewX(-7deg);animation:vsCarta .32s cubic-bezier(.2,.9,.3,1.3) both}
+.vs .vcard canvas{display:block;transform:skewX(7deg)}
+.vs .vcard .nm{background:#1a1a2e;color:#ffd166;text-align:center;font-size:13px;font-weight:bold;letter-spacing:1px;padding:2px 0}
+.vs .vcard .ar{position:absolute;right:-6px;top:-8px;transform:skewX(7deg)}
+.vs .chefe{position:absolute;right:26px;bottom:6px;animation:vsChefe .55s .45s cubic-bezier(.2,.9,.3,1.15) both}
+.vs .chefe canvas{animation:vsFlutua 1.6s ease-in-out infinite}
+.vs .aura{position:absolute;left:50%;bottom:10px;width:330px;height:60px;transform:translateX(-50%);border-radius:50%;filter:blur(2px);animation:vsAura 1s ease-in-out infinite alternate}
+.vs .placa{position:absolute;right:20px;top:44px;text-align:right;color:#fff;font-weight:bold;font-size:30px;letter-spacing:2px;text-shadow:3px 3px 0 #000,-2px -2px 0 #000;animation:vsSobe .3s .6s both}
+.vs .placa small{display:block;font-size:13px;letter-spacing:1px;color:#ffd166}
+.vs .vstxt{position:absolute;left:50%;top:48%;font-size:170px;font-weight:900;font-style:italic;letter-spacing:-8px;color:#ffd166;transform:translate(-50%,-50%);text-shadow:6px 6px 0 #e63946,12px 12px 0 #1a1a2e,-3px -3px 0 #1a1a2e,3px -3px 0 #1a1a2e,-3px 3px 0 #1a1a2e;animation:vsSlam .4s 1.1s cubic-bezier(.2,1.6,.4,1) both}
+.vs .fight{position:absolute;left:0;right:0;top:50%;text-align:center;font-size:120px;font-weight:900;font-style:italic;color:#fff;letter-spacing:6px;transform:translateY(-50%);text-shadow:5px 5px 0 #e63946,10px 10px 0 #1a1a2e,-3px -3px 0 #1a1a2e;opacity:0;animation:vsFight .9s 2.35s both}
+.vs .faixa{position:absolute;left:0;right:0;top:50%;height:150px;transform:translateY(-50%);background:rgba(10,6,24,.75);opacity:0;animation:vsFaixa .9s 2.3s both}
+.vs .pular{position:absolute;right:12px;bottom:8px;color:#fff;font-size:11px;opacity:.6}
+@keyframes vsEntraE{from{transform:translateX(-100%)}}
+@keyframes vsEntraD{from{transform:translateX(100%)}}
+@keyframes vsLinhas{to{transform:translateX(60px)}}
+@keyframes vsCorte{from{height:0;opacity:0}}
+@keyframes vsSobe{from{transform:translateY(-30px);opacity:0}}
+@keyframes vsCarta{from{transform:skewX(-7deg) translateX(-260px);opacity:0}}
+@keyframes vsChefe{from{transform:translateX(420px) scale(1.25);opacity:0}}
+@keyframes vsFlutua{50%{transform:translateY(-8px)}}
+@keyframes vsAura{from{opacity:.45;transform:translateX(-50%) scale(.9)}to{opacity:.9;transform:translateX(-50%) scale(1.1)}}
+@keyframes vsSlam{from{transform:translate(-50%,-50%) scale(5) rotate(-12deg);opacity:0}to{transform:translate(-50%,-50%) scale(1);opacity:1}}
+@keyframes vsFight{0%{opacity:0;transform:translateY(-50%) scale(3)}18%{opacity:1;transform:translateY(-50%) scale(.92)}28%{transform:translateY(-50%) scale(1.05)}85%{opacity:1}100%{opacity:1;transform:translateY(-50%) scale(1)}}
+@keyframes vsFaixa{from{opacity:0}20%{opacity:1}to{opacity:1}}
+@keyframes vsTreme{0%,100%{transform:translate(0,0)}20%{transform:translate(-14px,8px)}40%{transform:translate(12px,-10px)}60%{transform:translate(-8px,6px)}80%{transform:translate(6px,-4px)}}
+@keyframes vsSai{to{opacity:0;transform:scale(1.15)}}
